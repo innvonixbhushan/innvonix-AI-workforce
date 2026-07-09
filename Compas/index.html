@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workforce — built by Innvonix for Compass Intelligence & vMarque</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@600,700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --canvas:#FFFFFF; --surface:#FAFAFA; --surface2:#F2F2F2; --border:#E4E4E4;
+    --accent:#E5142B; --accent-dim:rgba(229,20,43,.07); --accent-line:rgba(229,20,43,.35);
+    --text:#1A1A1A; --hi:#000000; --tert:#767676; --done:#9A9A9A;
+  }
+  body{ background:var(--canvas); color:var(--text); font-family:'Inter',system-ui,sans-serif;
+    font-feature-settings:"cv11","ss03"; -webkit-font-smoothing:antialiased; min-height:100vh; }
+  h1,h2,h3,.display{ font-family:'General Sans','Inter',sans-serif; }
+  .tnum{ font-variant-numeric:tabular-nums; }
+  .hidden{ display:none !important; }
+
+  /* HEADER */
+  .header{ background:var(--canvas); border-bottom:1px solid var(--border); padding:16px 30px;
+    display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+  .logo{ display:flex; align-items:center; gap:12px; }
+  .logo .mark{ width:32px; height:32px; border:1px solid var(--accent-line); border-radius:8px;
+    display:flex; align-items:center; justify-content:center; color:var(--accent); font-weight:700;
+    font-family:'General Sans',sans-serif; font-size:16px; }
+  .logo .t{ font-size:15px; font-weight:600; color:var(--hi); letter-spacing:-.01em; }
+  .logo .s{ font-size:11px; color:var(--tert); margin-top:1px; }
+  .badge{ border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-size:11px; color:var(--tert); }
+  .badge b{ color:var(--hi); font-weight:600; }
+
+  /* TABS */
+  .tabs{ max-width:1140px; margin:0 auto; padding:22px 24px 0; display:flex; gap:6px; }
+  .tab{ padding:10px 18px; font-size:13px; font-weight:600; color:var(--tert); cursor:pointer;
+    border:1px solid transparent; border-radius:9px 9px 0 0; background:transparent; transition:.2s; }
+  .tab:hover{ color:var(--hi); }
+  .tab.active{ color:var(--hi); background:var(--surface); border-color:var(--border); border-bottom-color:var(--surface); }
+
+  .main{ max-width:1140px; margin:0 auto; padding:24px; }
+
+  .lead{ font-size:14px; color:var(--text); line-height:1.5; max-width:760px; margin-bottom:20px; }
+  .lead b{ color:var(--hi); font-weight:600; }
+
+  /* ECONOMICS STRIP */
+  .econ{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:26px; }
+  .econ .cell{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+  .econ .v{ font-size:26px; font-weight:700; color:var(--hi); font-family:'General Sans',sans-serif; }
+  .econ .v .u{ color:var(--accent); }
+  .econ .k{ font-size:11px; color:var(--tert); margin-top:4px; line-height:1.35; }
+  @media(max-width:780px){ .econ{ grid-template-columns:repeat(2,1fr);} }
+
+  .section-label{ font-size:11px; font-weight:600; letter-spacing:1.5px; color:var(--tert);
+    text-transform:uppercase; margin:6px 0 14px; display:flex; align-items:center; gap:10px; }
+  .section-label::after{ content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ROSTER */
+  .roster{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px; }
+  .emp{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; transition:.2s; }
+  .emp:hover{ border-color:#cfcfcf; }
+  .emp.working{ border-color:var(--accent); }
+  .emp-top{ display:flex; align-items:center; gap:13px; margin-bottom:14px; }
+  .avatar{ width:46px; height:46px; border-radius:50%; background:var(--surface2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--hi);
+    font-family:'General Sans',sans-serif; font-size:17px; flex-shrink:0; position:relative; }
+  .emp.working .avatar{ border-color:var(--accent); }
+  .emp.working .avatar::after{ content:''; position:absolute; right:-2px; bottom:-2px; width:11px; height:11px;
+    background:var(--accent); border:2px solid var(--surface); border-radius:50%; animation:pulse 1.1s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.3} }
+  .emp-name{ font-size:15px; font-weight:700; color:var(--hi); }
+  .emp-title{ font-size:12px; color:var(--tert); margin-top:1px; }
+  .emp-owns{ font-size:12px; color:var(--text); margin-bottom:10px; }
+  .emp-owns b{ color:var(--hi); font-weight:600; }
+  .team{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .team .chip{ font-size:10.5px; color:var(--tert); background:var(--canvas); border:1px solid var(--border);
+    border-radius:6px; padding:3px 8px; display:flex; align-items:center; gap:4px; }
+  .emp-stats{ display:flex; gap:16px; padding:12px 0; border-top:1px solid var(--border); margin-bottom:13px; }
+  .emp-stats .st{ font-size:11px; color:var(--tert); }
+  .emp-stats .st b{ display:block; font-size:16px; color:var(--hi); font-weight:700; font-family:'General Sans',sans-serif; }
+  .emp-actions{ display:flex; gap:8px; }
+  .btn{ font-family:inherit; font-size:12.5px; font-weight:600; border-radius:8px; padding:9px 14px; cursor:pointer;
+    border:1px solid var(--border); background:var(--canvas); color:var(--hi); transition:.15s; }
+  .btn:hover{ border-color:#bdbdbd; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover{ opacity:.9; }
+  .btn.primary:disabled{ opacity:.4; cursor:not-allowed; }
+  .btn.ghost{ background:transparent; }
+  .btn.big{ padding:12px 22px; font-size:13.5px; }
+
+  .hire-card{ border:1.5px dashed var(--border); background:transparent; border-radius:14px; padding:18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    cursor:pointer; min-height:200px; transition:.2s; }
+  .hire-card:hover{ border-color:var(--accent); }
+  .hire-card .plus{ width:42px; height:42px; border-radius:50%; border:1px solid var(--accent-line); color:var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; }
+  .hire-card .h{ font-size:14px; font-weight:600; color:var(--hi); }
+  .hire-card .p{ font-size:12px; color:var(--tert); margin-top:4px; max-width:200px; }
+
+  /* RUN PANEL */
+  .run{ margin-top:26px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px; }
+  .run-head{ display:flex; align-items:center; gap:13px; margin-bottom:8px; }
+  .run-head .emp-name{ font-size:16px; }
+  .run-sub{ font-size:12px; color:var(--tert); margin-bottom:16px; }
+  .run-input{ display:flex; gap:10px; align-items:flex-end; margin-bottom:18px; }
+  .run-input textarea{ flex:1; background:var(--canvas); border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; font-family:inherit; font-size:13px; color:var(--hi); resize:none; min-height:58px; outline:none; line-height:1.45; }
+  .run-input textarea:focus{ border-color:var(--accent); }
+
+  .phases{ display:flex; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px; background:var(--canvas); }
+  .ph{ flex:1; padding:11px 14px; display:flex; align-items:center; gap:9px; border-right:1px solid var(--border); }
+  .ph:last-child{ border-right:none; }
+  .ph.active{ background:var(--accent-dim); }
+  .ph.done{ background:var(--surface2); }
+  .ph .dot{ width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border); background:var(--surface2);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--tert); flex-shrink:0; }
+  .ph.active .dot{ border-color:var(--accent); color:var(--accent); }
+  .ph.done .dot{ border-color:var(--done); color:var(--done); }
+  .ph .l{ font-size:12px; font-weight:600; color:var(--tert); }
+  .ph.active .l{ color:var(--hi); }
+
+  .agent-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; margin-bottom:16px; }
+  .acard{ background:var(--canvas); border:1px solid var(--border); border-radius:10px; padding:13px; opacity:.5; transition:.3s; }
+  .acard.visible{ opacity:1; } .acard.running{ border-color:var(--accent); opacity:1; } .acard.done{ border-color:#cfcfcf; opacity:1; }
+  .acard .ae{ font-size:18px; margin-bottom:6px; }
+  .acard .ar{ font-size:12.5px; font-weight:700; color:var(--hi); }
+  .acard .at{ font-size:11px; color:var(--tert); line-height:1.45; margin-top:3px; }
+  .acard .as{ margin-top:9px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px; color:var(--tert); }
+  .acard .sd{ width:6px; height:6px; border-radius:50%; background:var(--tert); }
+  .acard.running .sd{ background:var(--accent); animation:pulse 1.1s infinite; }
+  .acard.done .sd{ background:var(--done); }
+
+  .feed{ background:var(--canvas); border:1px solid var(--border); border-radius:10px; height:170px; overflow-y:auto;
+    padding:8px 0; font-size:11.5px; font-family:'Inter',monospace; margin-bottom:16px; }
+  .feed::-webkit-scrollbar{ width:4px; } .feed::-webkit-scrollbar-thumb{ background:var(--border); border-radius:2px; }
+  .frow{ padding:3px 16px; display:grid; grid-template-columns:64px 150px 1fr; gap:9px; animation:fade .3s; }
+  @keyframes fade{ from{opacity:0} to{opacity:1} }
+  .frow .ft{ color:var(--tert); } .frow .fa{ color:var(--hi); } .frow .fd{ color:var(--text); opacity:.85; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .result{ display:grid; grid-template-columns:260px 1fr; gap:14px; margin-bottom:8px; }
+  @media(max-width:760px){ .result{ grid-template-columns:1fr; } }
+  .rstats{ background:var(--canvas); border:1px solid var(--border); border-radius:10px; padding:18px; }
+  .rrow{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .rrow:last-child{ border-bottom:none; } .rrow .k{ color:var(--tert); } .rrow .v{ color:var(--hi); font-weight:600; }
+  .rout{ background:var(--canvas); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .rout .rh{ padding:12px 16px; border-bottom:1px solid var(--border); font-size:12px; font-weight:600; color:var(--hi); }
+  .rout .rb{ padding:18px; font-size:12.5px; line-height:1.7; white-space:pre-wrap; max-height:320px; overflow-y:auto; }
+  .rout .rb::-webkit-scrollbar{ width:4px; } .rout .rb::-webkit-scrollbar-thumb{ background:var(--border); border-radius:2px; }
+  .donebar{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin-top:14px; font-size:13px; color:var(--text); }
+  .donebar b{ color:var(--hi); }
+
+  /* BUILDER */
+  .steps{ display:flex; gap:8px; margin-bottom:22px; }
+  .step{ flex:1; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+  .step .n{ font-size:11px; font-weight:700; color:var(--tert); letter-spacing:1px; }
+  .step.active .n{ color:var(--accent); }
+  .step .l{ font-size:13px; font-weight:600; color:var(--hi); margin-top:2px; }
+  .step .d{ font-size:11px; color:var(--tert); margin-top:2px; }
+
+  .wf-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+  .wf{ border:1px solid var(--border); border-radius:11px; padding:15px; cursor:pointer; background:var(--surface); transition:.15s; }
+  .wf:hover{ border-color:#bdbdbd; }
+  .wf.sel{ border-color:var(--accent); background:var(--accent-dim); }
+  .wf .wn{ font-size:14px; font-weight:700; color:var(--hi); }
+  .wf .wd{ font-size:11.5px; color:var(--tert); margin-top:5px; line-height:1.4; }
+  .wf .wm{ font-size:10px; color:var(--accent); margin-top:8px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+
+  .task-row{ display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); margin-bottom:8px; }
+  .task-row .tn{ width:24px; height:24px; border-radius:50%; background:var(--surface2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--hi); flex-shrink:0; }
+  .task-row .tt{ flex:1; font-size:12.5px; color:var(--text); line-height:1.4; }
+  .task-row select{ font-family:inherit; font-size:12px; color:var(--hi); border:1px solid var(--border);
+    border-radius:7px; padding:7px 9px; background:var(--canvas); min-width:170px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12px; font-weight:600; color:var(--hi); margin-bottom:6px; }
+  .field input[type=text]{ width:100%; font-family:inherit; font-size:13px; color:var(--hi); border:1px solid var(--border);
+    border-radius:9px; padding:11px 13px; outline:none; background:var(--canvas); }
+  .field input:focus{ border-color:var(--accent); }
+  .seg{ display:inline-flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; }
+  .seg button{ font-family:inherit; font-size:12px; padding:9px 15px; border:none; background:var(--canvas); color:var(--tert); cursor:pointer; border-right:1px solid var(--border); }
+  .seg button:last-child{ border-right:none; }
+  .seg button.on{ background:var(--accent); color:#fff; }
+  .checks{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chk{ font-size:12px; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 12px; cursor:pointer; user-select:none; background:var(--canvas); }
+  .chk.on{ border-color:var(--accent); color:var(--hi); background:var(--accent-dim); }
+  .builder-nav{ display:flex; justify-content:space-between; margin-top:22px; }
+  .preview-emp{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:8px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="mark">I</div>
+    <div>
+      <div class="t">AI Workforce Platform</div>
+      <div class="s">Built by Innvonix &nbsp;·&nbsp; white-labelled for Compass Intelligence &amp; vMarque</div>
+    </div>
+  </div>
+  <div class="badge">White-label demo &nbsp;·&nbsp; <b>Innvonix Tech Solutions</b></div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tabWorkforce" onclick="setView('workforce')">Your AI workforce</button>
+  <button class="tab" id="tabHire" onclick="setView('hire')">Hire an AI employee</button>
+</div>
+
+<div class="main">
+
+  <!-- WORKFORCE VIEW -->
+  <div id="view-workforce">
+    <div class="lead">Each AI employee is a <b>workflow turned into a digital hire</b>: a fixed team of specialist agents, a defined job, and your house standards baked in. You manage them like staff — assign a task and the employee runs its whole workflow end to end.</div>
+
+    <div class="econ" id="econStrip"></div>
+
+    <div class="section-label">Your roster</div>
+    <div class="roster" id="roster"></div>
+
+    <div id="runPanel"></div>
+  </div>
+
+  <!-- HIRE / BUILDER VIEW -->
+  <div id="view-hire" class="hidden">
+    <div class="lead">Build a new AI employee in three steps: <b>pick the workflow</b> it will own, <b>assign each task to an agent</b>, then <b>give it a name and a job description</b>. It joins your roster and is ready to work.</div>
+    <div class="steps" id="builderSteps"></div>
+    <div id="builderBody"></div>
+    <div class="builder-nav" id="builderNav"></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════ AGENTS ════════════════════
+const AGENT_ROLES = {
+  research:    { emoji:'🔍', label:'Research Lead',          tools:['gather_sources','run_survey_pull','save_to_context'] },
+  sizing:      { emoji:'📐', label:'Market Sizing Analyst',  tools:['build_tam_sam_model','forecast_cagr','save_to_context'] },
+  competitive: { emoji:'🎯', label:'Competitive Intel',      tools:['profile_vendors','score_rubric','save_to_context'] },
+  analyst:     { emoji:'📊', label:'Insights Analyst',       tools:['segment_market','extract_patterns','save_to_context'] },
+  strategist:  { emoji:'🧭', label:'Strategy Lead',          tools:['map_strategy','prioritise_moves','save_to_context'] },
+  surveyor:    { emoji:'📋', label:'Survey & Insights Lead',  tools:['design_instrument','field_and_weight','cross_tabulate','save_to_context'] },
+  modeler:     { emoji:'🧮', label:'Quant Modeler',          tools:['build_value_model','run_sensitivity','save_to_context'] },
+  interviewer: { emoji:'🎙️', label:'ExecChat Producer',       tools:['build_brief','design_questions','synthesize_interview','save_to_context'] },
+  writer:      { emoji:'✍️', label:'Writer',                  tools:['draft_narrative','build_exec_deck','save_to_context'] },
+  creative:    { emoji:'🎨', label:'Brand & Creative',        tools:['craft_messaging','draft_web_copy','save_to_context'] },
+  editor:      { emoji:'🔎', label:'Editorial QA',            tools:['fact_check','voice_review','save_to_context'] },
+};
+const ROLE_KEYS = Object.keys(AGENT_ROLES);
+
+// ════════════════════ WORKFLOWS (job templates) ════════════════════
+const WORKFLOWS = {
+  sizing: { name:'Market sizing & forecasting', deliverable:'sizing', mode:'dag',
+    sample:'Size the global edge-AI gateway market through 2030 with TAM, SAM and a five-year CAGR',
+    desc:'Parallel supply- and demand-side research into a TAM/SAM/SOM model and forecast.',
+    tasks:[
+      { agent:'research',  task:'Pull supply-side landscape: shipments, installed base, ASPs, recent vendor and carrier moves.', deps:[] },
+      { agent:'research',  task:'Pull demand-side signals: adoption rates, buying patterns, willingness to pay.', deps:[] },
+      { agent:'sizing',    task:'Build the TAM / SAM / SOM model bottom-up, cross-check top-down, forecast a defensible CAGR.', deps:[0,1] },
+      { agent:'analyst',   task:'Segment by geography and use case, isolate growth pockets, stress-test assumptions.', deps:[2] },
+      { agent:'writer',    task:'Package into a client-ready market-sizing brief with chart-ready tables.', deps:[3] },
+    ]},
+  survey: { name:'Buyer / decision-maker survey', deliverable:'survey', mode:'sequential',
+    sample:'Design and analyse a decision-maker survey on connected-vehicle buyer patterns and willingness to pay',
+    desc:'Instrument design, fielding and weighting, cross-tabs, then an executive readout.',
+    tasks:[
+      { agent:'surveyor', task:'Design the instrument: screener, firmographics, and the question battery.', deps:[] },
+      { agent:'surveyor', task:'Field to the decision-maker panel and weight responses to the target universe.', deps:[0] },
+      { agent:'analyst',  task:'Cross-tabulate by segment, isolate significant differences, flag low-confidence cells.', deps:[1] },
+      { agent:'writer',   task:'Build the executive readout deck plus the raw data cuts.', deps:[2] },
+    ]},
+  roi: { name:'ROI value model & sales tool', deliverable:'roi', mode:'sequential',
+    sample:'Build an ROI model and sales tool to quantify small-cell value for commercial real estate',
+    desc:'Cost/benefit research, a value model, sensitivity, packaged as a live sales calculator.',
+    tasks:[
+      { agent:'research', task:'Gather the cost and benefit drivers and credible benchmarks for the use case.', deps:[] },
+      { agent:'modeler',  task:'Build the ROI / value model: inputs, payback, and the headline value per site.', deps:[0] },
+      { agent:'modeler',  task:'Run sensitivity on the load-bearing inputs; set conservative / expected / aggressive cases.', deps:[1] },
+      { agent:'writer',   task:'Wrap it into a one-screen sales calculator narrative and a value one-pager.', deps:[2] },
+    ]},
+  stateofmarket: { name:'State-of-the-market briefing', deliverable:'stateofmarket', mode:'dag',
+    sample:'Build a state-of-the-market briefing on industrial IoT to onboard a new product team',
+    desc:'Parallel landscape and player-map research, synthesised into a strategic onboarding deck.',
+    tasks:[
+      { agent:'research',    task:'Map the market: size, structure, value chain, and the forces reshaping it.', deps:[] },
+      { agent:'competitive', task:'Profile the key players and pin down where each one actually competes.', deps:[] },
+      { agent:'strategist',  task:'Synthesise structure into the strategic picture and implications for a new team.', deps:[0,1] },
+      { agent:'writer',      task:'Produce the onboarding briefing deck, clear enough for day one.', deps:[2] },
+    ]},
+  awards: { name:'Awards & A-List adjudication', deliverable:'awards', mode:'sequential',
+    sample:"Score this year's IoT Innovator Award nominees and rank the A-List Index",
+    desc:'Profile the nominee field, score on your rubric, rank, and write the citations.',
+    tasks:[
+      { agent:'research',    task:'Compile and profile the nominee field and the evidence each submission claims.', deps:[] },
+      { agent:'competitive', task:'Score every nominee on the four-pillar rubric with an evidence note per score.', deps:[0] },
+      { agent:'analyst',     task:'Rank the field, surface the movers, and write the rationale per category winner.', deps:[1] },
+      { agent:'writer',      task:'Produce the index write-up and the winner citations.', deps:[2] },
+    ]},
+  execchat: { name:'ExecChat executive interview', deliverable:'execchat', mode:'dag',
+    sample:'Prep and produce an ExecChat with an SVP on physical AI and robotics, timed to CES',
+    desc:'Research the exec and topic, design the question arc, synthesise, produce a feature + social.',
+    tasks:[
+      { agent:'research',    task:'Research the executive, their company, and the topic; surface what is genuinely new.', deps:[] },
+      { agent:'interviewer', task:'Design the question arc — open broad, probe indicators, end on the bold forecast.', deps:[0] },
+      { agent:'interviewer', task:'Synthesise the conversation into the through-line and three quotable moments.', deps:[1] },
+      { agent:'writer',      task:'Produce the feature, the newsletter slot, and the social cutdowns.', deps:[2] },
+      { agent:'editor',      task:'Fact-check, clear the quotes, and match the house voice.', deps:[3] },
+    ]},
+  content: { name:'Thought leadership / Inside Mobile', deliverable:'content', mode:'dag',
+    sample:'Draft the next Inside Mobile newsletter on physical AI at the edge',
+    desc:'Research, a sharp angle, a draft in the house voice, then an editorial pass.',
+    tasks:[
+      { agent:'research', task:'Gather the latest developments, data points, and notable quotes from credible sources.', deps:[] },
+      { agent:'analyst',  task:'Define the contrarian-but-defensible angle and the three fresh takeaways.', deps:[0] },
+      { agent:'writer',   task:'Draft the piece in the Compass / Inside Mobile voice with a clear so-what.', deps:[1] },
+      { agent:'editor',   task:'Fact-check every figure, tighten prose, confirm it reads like Stephanie.', deps:[2] },
+    ]},
+  brand: { name:'vMarque web & branding', deliverable:'brand', mode:'dag',
+    sample:'Create vMarque positioning and homepage copy for a fast-growing logistics SaaS',
+    desc:'Brand discovery, then positioning and web copy in parallel, unified for design.',
+    tasks:[
+      { agent:'research',  task:"Run brand discovery: the client's market, competitor positioning, audience, gaps to claim.", deps:[] },
+      { agent:'creative',  task:'Craft the positioning statement, value proposition, and brand voice attributes.', deps:[0] },
+      { agent:'writer',    task:'Draft the homepage hero, three section headlines, and the calls to action.', deps:[0] },
+      { agent:'editor',    task:'Unify positioning and web copy into one voice and prep the handoff to design.', deps:[1,2] },
+    ]},
+};
+
+const DELIVERABLE_TITLES = {
+  sizing:'Market-Sizing Brief', survey:'Buyer Survey Readout', roi:'ROI Value Model & Sales Tool',
+  stateofmarket:'State-of-the-Market Briefing', awards:'A-List / Awards Scorecard',
+  execchat:'ExecChat Feature & Social Pack', content:'Inside Mobile Draft', brand:'Brand & Web Package',
+};
+
+// ════════════════════ SIMULATED OUTPUTS ════════════════════
+const TOOL_OUTPUTS = {
+  gather_sources:()=>'Retrieved 18 credible sources; deduped and ranked by recency.',
+  run_survey_pull:()=>'Pulled 312 decision-maker responses from the panel, weighted to the universe.',
+  build_tam_sam_model:()=>'Model built bottom-up, cross-checked top-down. Variance under 6%.',
+  forecast_cagr:()=>'Five-year forecast set; base / bull / bear with a sensitivity table.',
+  profile_vendors:()=>'Profiled 11 players across product, pricing, partner depth, traction.',
+  score_rubric:()=>'Scored every entry on the 4-pillar rubric with an evidence note each.',
+  segment_market:()=>'Segmented by geography and use case; two high-growth pockets isolated.',
+  extract_patterns:()=>'Three durable patterns surfaced; one repeated claim flagged unsupported.',
+  map_strategy:()=>'Mapped where value is migrating; two structural shifts with implications.',
+  prioritise_moves:()=>'Ranked moves by impact and feasibility; top three sequenced 0-6-12.',
+  design_instrument:()=>'Instrument drafted: screener, 6 firmographic cuts, 22-question battery.',
+  field_and_weight:()=>'Fielded; 312 qualified responses weighted by firm size and role.',
+  cross_tabulate:()=>'Cross-tabs across 6 segments; significant gaps flagged, low-n suppressed.',
+  build_value_model:()=>'Value model built: inputs, benefit lines, payback per site.',
+  run_sensitivity:()=>'Sensitivity on 3 inputs; conservative / expected / aggressive set.',
+  build_brief:()=>'Background brief on the exec, company, and topic; 3 probing angles.',
+  design_questions:()=>'Question arc designed: open, market-indicator probes, closing forecast.',
+  synthesize_interview:()=>'Distilled to one through-line and three time-stamped quotes.',
+  craft_messaging:()=>'Positioning, value prop, four voice attributes; tested for whitespace.',
+  draft_web_copy:()=>'Hero, three headlines, CTAs in three length variants.',
+  draft_narrative:()=>'Narrative drafted: thesis, data anchors, a sharp closing so-what.',
+  build_exec_deck:()=>'Executive deck outline: 6 slides, one argument each.',
+  fact_check:()=>'Every figure traced to source; one stat corrected, one softened.',
+  voice_review:()=>'Voice pass done; filler cut, two AI-tells removed.',
+  save_to_context:()=>'Saved to shared memory for downstream agents.',
+};
+function toolOut(t){ return (TOOL_OUTPUTS[t]||(()=>'Executed.'))(); }
+
+const FINAL_OUTPUTS = {
+  sizing:`MARKET-SIZING BRIEF  (illustrative sample output)
+
+Executive summary
+The category is moving from early adoption into mainstream enterprise deployment, with two segments running well ahead of the field.
+
+Market model (sample figures)
+• TAM 2025:  $4.9B  →  2030: $13.6B
+• SAM (serviceable):  ~52% of TAM
+• 5-yr CAGR:  22.6%  (base; bull 27.1% / bear 16.4%)
+
+Where the growth concentrates
+1. Industrial & manufacturing edge — fastest pocket, pulled by predictive maintenance.
+2. Connected fleet & logistics — steady double-digit growth, low churn.
+3. Retail / smart-building — slower, price-sensitive, high volume.
+
+Recommendation
+Lead commercial focus on the industrial-edge pocket; treat retail as a volume play.
+
+→ Saved: market_sizing_brief, forecast_model.xlsx, assumptions_log`,
+  survey:`BUYER SURVEY — EXECUTIVE READOUT  (illustrative sample output)
+
+Method
+• n = 312 decision-makers, weighted by firm size and role. MoE ±5.5% at 95%.
+
+What buyers told us
+• 67% have budget approved or planned in the next 18 months (up from 48%).
+• Integration is the #1 barrier (71%), ahead of price (44%).
+• Willingness to pay clusters at two points; the mid-tier is the sweet spot.
+
+Where segments split
+• Enterprise buys on roadmap and security; mid-market buys on time-to-value.
+
+So-what
+Lead with an integration story, not a feature list. Package a mid-tier SKU at the sweet spot.
+
+→ Saved: survey_readout_deck, crosstabs.xlsx, raw_data_cuts, questionnaire`,
+  roi:`ROI VALUE MODEL & SALES TOOL  (illustrative sample output)
+
+Headline (illustrative inputs)
+• Investment: $1.0M over 3 years  ·  Quantified benefit: $3.2M
+• Payback: 14 months  ·  3-yr ROI: ~220%
+
+What drives the number
+• Avoided downtime and truck-rolls (largest line)
+• Labour reallocated from manual monitoring
+• Higher utilisation of existing assets
+
+Scenario range
+• Conservative 21 mo  ·  Expected 14 mo  ·  Aggressive 9 mo
+• Most exposed to the downtime-avoidance assumption — flagged for the client to set.
+
+How the client uses it
+A one-screen calculator the sales team runs live, plus a value one-pager per site.
+
+→ Saved: value_model.xlsx, sales_calculator, value_one_pager`,
+  stateofmarket:`STATE-OF-THE-MARKET BRIEFING  (illustrative sample output)
+
+The market in one paragraph
+The category has crossed from pilot to deployment. Spend is shifting from hardware to the software and services layer; the buyer has moved from the lab to the line of business.
+
+Structure & value chain
+• Silicon & modules → connectivity → platforms → integration & services.
+• Margin is migrating downstream; hardware is commoditising.
+
+Key players — where each really competes
+• Incumbents A and B own the enterprise account and the roadmap.
+• Challengers C and D win on time-to-value and vertical depth.
+• White space: the underserved mid-market and two verticals.
+
+Strategic implications for the new team
+1. Compete on integration and outcomes, not specs.
+2. The mid-market is the unguarded flank.
+3. Watch the platform layer — the next consolidation happens there.
+
+→ Saved: state_of_market_deck, player_map, value_chain_diagram`,
+  awards:`A-LIST INDEX — RANKED FIELD  (illustrative sample output)
+
+Leaderboard (this cycle)
+1.  Vendor A — 91 / 100   ▲ from #3
+2.  Vendor B — 88 / 100   ▬ holds
+3.  Vendor C — 84 / 100   ▼ from #1
+4.  Vendor D — 79 / 100   ▲ from #6
+5.  Vendor E — 76 / 100   ▬ holds
+
+Pillars (out of 25): market presence · innovation · partner depth · customer traction
+
+What moved and why
+• Vendor A took #1 on partner depth — three carrier deals and a hyperscaler listing.
+• Vendor C slipped on innovation cadence; the roadmap went quiet.
+• Vendor D is the mover to watch — traction is outrunning presence.
+
+→ Saved: alist_index_writeup, vendor_scorecards, movers_analysis`,
+  execchat:`EXECCHAT — FEATURE & SOCIAL PACK  (illustrative sample output)
+
+The through-line
+Physical AI is moving from demo to deployment; the bottleneck shifted from the model to the factory floor.
+
+Question arc (abbreviated)
+1. What changed in the last 12 months that the market underrates?
+2. Where does physical AI actually pay for itself today?
+3. What is the one indicator you watch that we should too?
+
+Three quotable moments
+• "The humanoids get the headlines; the gateways get the budget."
+• "We stopped selling autonomy and started selling uptime."
+• "Watch attach-rate, not unit shipments."
+
+The output pack
+• 900-word feature for Inside Mobile  • Three social cutdowns  • A 40-second pull-quote reel
+
+→ Saved: execchat_feature, social_cutdowns, pull_quotes`,
+  content:`INSIDE MOBILE — DRAFT  (illustrative sample output)
+
+Headline:  Physical AI is the quiet story of the year, and the robots aren't the point
+
+The hook
+Everyone is watching the humanoids. The real shift is one layer down — AI pushed onto the factory floor and the gateway at the edge — and that is where the money is moving.
+
+Three takeaways
+1. The constraint is no longer the model; it's getting inference to where the work happens.
+2. The winners are integrators, not just chipmakers.
+3. Buyers stopped asking "can it work" and started asking "what's the payback."
+
+The so-what
+If your roadmap treats AI and connectivity as separate conversations, you're selling two halves of a whole.
+
+→ Saved: inside_mobile_draft, source_citations`,
+  brand:`vMARQUE — BRAND & WEB PACKAGE  (illustrative sample output)
+
+Positioning statement
+For fast-growing logistics teams who've outgrown spreadsheets, [Client] turns shipment chaos into a single live view — without an enterprise rollout.
+
+Value proposition
+See every shipment, predict every delay, in one screen your team trusts.
+
+Brand voice
+Plain-spoken · Confident · Operator-to-operator · Never jargon-heavy
+
+Homepage hero
+H1:  Stop chasing shipments. Start seeing them.
+Sub: One live view of every load, every carrier, every exception — set up in days.
+CTA: See it on your own data
+
+→ Saved: brand_package, web_copy_variants, voice_guide`,
+};
+
+// ════════════════════ STATE ════════════════════
+let EMPLOYEES = [
+  { id:'ava',    name:'Ava',    title:'AI Market Analyst',           wf:'sizing',        shipped:12, hrs:284, fte:0.8, status:'idle' },
+  { id:'nina',   name:'Nina',   title:'AI Survey Lead',              wf:'survey',        shipped:7,  hrs:196, fte:0.6, status:'idle' },
+  { id:'marcus', name:'Marcus', title:'AI Value Engineer',           wf:'roi',           shipped:9,  hrs:171, fte:0.5, status:'idle' },
+  { id:'iris',   name:'Iris',   title:'AI Competitive & Awards Lead', wf:'awards',       shipped:5,  hrs:140, fte:0.4, status:'idle' },
+  { id:'leo',    name:'Leo',    title:'AI Content & ExecChat Producer', wf:'execchat',   shipped:18, hrs:212, fte:0.7, status:'idle' },
+  { id:'maya',   name:'Maya',   title:'AI Brand Strategist (vMarque)', wf:'brand',       shipped:14, hrs:168, fte:0.5, status:'idle' },
+];
+let running = false;
+
+// ════════════════════ HELPERS ════════════════════
+const $ = id => document.getElementById(id);
+function now(){ return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const rand = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+function monogram(name){ return name.trim().slice(0,2).toUpperCase(); }
+
+// ════════════════════ VIEWS ════════════════════
+function setView(v){
+  $('view-workforce').classList.toggle('hidden', v!=='workforce');
+  $('view-hire').classList.toggle('hidden', v!=='hire');
+  $('tabWorkforce').classList.toggle('active', v==='workforce');
+  $('tabHire').classList.toggle('active', v==='hire');
+  if(v==='hire') initBuilder();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderEcon(){
+  const total = EMPLOYEES.length;
+  const shipped = EMPLOYEES.reduce((s,e)=>s+e.shipped,0);
+  const hrs = EMPLOYEES.reduce((s,e)=>s+e.hrs,0);
+  const fte = EMPLOYEES.reduce((s,e)=>s+e.fte,0).toFixed(1);
+  const cells = [
+    [total+'', 'AI employees on the roster'],
+    [shipped+'', 'Client deliverables shipped'],
+    ['~'+hrs.toLocaleString(), 'Senior analyst-hours saved'],
+    ['≈'+fte+'<span class="u"> FTE</span>', 'Workforce capacity, no headcount added'],
+  ];
+  $('econStrip').innerHTML = cells.map(c=>`<div class="cell"><div class="v tnum">${c[0]}</div><div class="k">${c[1]}</div></div>`).join('');
+}
+
+function renderRoster(){
+  const html = EMPLOYEES.map(e=>{
+    const wf = WORKFLOWS[e.wf];
+    const team = wf.tasks.map(t=>t.agent).filter((v,i,a)=>a.indexOf(v)===i)
+      .map(r=>`<span class="chip">${AGENT_ROLES[r].emoji} ${AGENT_ROLES[r].label}</span>`).join('');
+    return `<div class="emp ${e.status==='working'?'working':''}" id="emp-${e.id}">
+      <div class="emp-top">
+        <div class="avatar">${monogram(e.name)}</div>
+        <div><div class="emp-name">${e.name}</div><div class="emp-title">${e.title}</div></div>
+      </div>
+      <div class="emp-owns">Owns: <b>${wf.name}</b></div>
+      <div class="team">${team}</div>
+      <div class="emp-stats">
+        <div class="st"><b class="tnum">${e.shipped}</b>deliverables</div>
+        <div class="st"><b class="tnum">~${e.hrs}</b>hrs saved</div>
+        <div class="st"><b class="tnum">≈${e.fte}</b>FTE</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn primary" onclick="assign('${e.id}')">Assign a task</button>
+        <button class="btn ghost" onclick="assign('${e.id}')">View workflow</button>
+      </div>
+    </div>`;
+  }).join('');
+  const hire = `<div class="hire-card" onclick="setView('hire')">
+      <div class="plus">+</div><div class="h">Hire a new AI employee</div>
+      <div class="p">Pick a workflow, assign the tasks, define the role.</div></div>`;
+  $('roster').innerHTML = html + hire;
+}
+
+// ════════════════════ RUN AN EMPLOYEE ════════════════════
+function assign(empId){
+  if(running) return;
+  const e = EMPLOYEES.find(x=>x.id===empId);
+  const wf = WORKFLOWS[e.wf];
+  $('runPanel').innerHTML = `
+    <div class="run" id="run">
+      <div class="run-head">
+        <div class="avatar">${monogram(e.name)}</div>
+        <div><div class="emp-name">${e.name} · ${e.title}</div><div class="run-sub">Owns ${wf.name}. Give a task and ${e.name} runs the full workflow.</div></div>
+      </div>
+      <div class="run-input">
+        <textarea id="taskInput">${wf.sample}</textarea>
+        <button class="btn primary big" id="goBtn" onclick="runEmployee('${e.id}')">▶ Put ${e.name} to work</button>
+      </div>
+      <div id="runStage"></div>
+    </div>`;
+  $('run').scrollIntoView({behavior:'smooth', block:'start'});
+  $('taskInput').focus();
+}
+
+async function runEmployee(empId){
+  if(running) return; running = true;
+  const e = EMPLOYEES.find(x=>x.id===empId);
+  const wf = WORKFLOWS[e.wf];
+  const task = ($('taskInput').value||wf.sample).trim();
+  $('goBtn').disabled = true;
+  e.status='working'; const card=$('emp-'+e.id); if(card) card.classList.add('working');
+
+  const stage = $('runStage');
+  stage.innerHTML = `
+    <div class="phases">
+      <div class="ph active" id="ph1"><div class="dot">1</div><div class="l">Assign &amp; plan</div></div>
+      <div class="ph" id="ph2"><div class="dot">2</div><div class="l">Agents work</div></div>
+      <div class="ph" id="ph3"><div class="dot">3</div><div class="l">Deliverable</div></div>
+    </div>
+    <div class="agent-grid" id="agrid"></div>
+    <div class="feed" id="feed"></div>
+    <div id="resultArea"></div>`;
+
+  const feed = $('feed');
+  function log(roleKey, detail){
+    const r = AGENT_ROLES[roleKey];
+    const nm = r ? (r.emoji+' '+r.label) : '◆ '+e.name;
+    const row=document.createElement('div'); row.className='frow';
+    row.innerHTML=`<span class="ft tnum">${now()}</span><span class="fa">${nm}</span><span class="fd">${detail.substring(0,130)}</span>`;
+    feed.appendChild(row); feed.scrollTop=feed.scrollHeight;
+  }
+
+  log(null, `Task received: "${task.substring(0,60)}${task.length>60?'…':''}"`);
+  log(null, `Running the ${wf.name} workflow · ${wf.tasks.length} agents · ${wf.mode.toUpperCase()} mode`);
+  await sleep(rand(700,1100));
+
+  // build agent cards
+  const grid=$('agrid');
+  wf.tasks.forEach((t,i)=>{
+    const r=AGENT_ROLES[t.agent];
+    const c=document.createElement('div'); c.className='acard'; c.id='ac-'+i;
+    c.innerHTML=`<div class="ae">${r.emoji}</div><div class="ar">${r.label}</div>
+      <div class="at">${t.task}</div>
+      <div class="as"><span class="sd"></span><span id="ast-${i}">Queued</span></div>`;
+    grid.appendChild(c);
+    setTimeout(()=>c.classList.add('visible'), i*90);
+  });
+  await sleep(600);
+
+  // phase 2
+  $('ph1').classList.remove('active'); $('ph1').classList.add('done'); $('ph1').querySelector('.dot').textContent='✓';
+  $('ph2').classList.add('active');
+
+  const done = new Set();
+  async function runOne(i){
+    const t=wf.tasks[i], r=AGENT_ROLES[t.agent];
+    const c=$('ac-'+i), st=$('ast-'+i);
+    c.classList.remove('visible'); c.classList.add('running'); st.textContent='Working…';
+    log(t.agent, t.task.substring(0,70));
+    await sleep(rand(450,800));
+    for(const tool of r.tools){
+      log(t.agent, tool+'( ) → '+toolOut(tool));
+      await sleep(rand(450,850));
+    }
+    c.classList.remove('running'); c.classList.add('done'); st.textContent='Done';
+    log(t.agent, 'Output saved to shared memory');
+    done.add(i);
+  }
+
+  if(wf.mode==='sequential'){
+    for(let i=0;i<wf.tasks.length;i++) await runOne(i);
+  } else { // dag
+    while(done.size<wf.tasks.length){
+      const ready=wf.tasks.map((t,i)=>i).filter(i=>!done.has(i)&&wf.tasks[i].deps.every(d=>done.has(d)));
+      if(!ready.length) break;
+      if(ready.length>1) await Promise.all(ready.map(runOne)); else await runOne(ready[0]);
+    }
+  }
+
+  // phase 3
+  $('ph2').classList.remove('active'); $('ph2').classList.add('done'); $('ph2').querySelector('.dot').textContent='✓';
+  $('ph3').classList.add('active'); $('ph3').querySelector('.dot').textContent='✓'; $('ph3').classList.add('done');
+  await sleep(400);
+
+  const hrsThis = wf.tasks.length*rand(5,8);
+  const out = FINAL_OUTPUTS[wf.deliverable] || 'Deliverable ready.';
+  $('resultArea').innerHTML = `
+    <div class="result">
+      <div class="rstats">
+        <div class="rrow"><span class="k">Employee</span><span class="v">${e.name}</span></div>
+        <div class="rrow"><span class="k">Workflow</span><span class="v">${wf.name}</span></div>
+        <div class="rrow"><span class="k">Agents run</span><span class="v tnum">${wf.tasks.length}</span></div>
+        <div class="rrow"><span class="k">Mode</span><span class="v">${wf.mode.toUpperCase()}</span></div>
+        <div class="rrow"><span class="k">Analyst-hours saved</span><span class="v tnum">≈ ${hrsThis}</span></div>
+      </div>
+      <div class="rout">
+        <div class="rh">Deliverable · ${DELIVERABLE_TITLES[wf.deliverable]||'Output'}</div>
+        <div class="rb">${out}</div>
+      </div>
+    </div>
+    <div class="donebar"><b>${e.name} finished.</b> Workflow complete, deliverable saved, and ${e.name}'s record updated. Figures shown are illustrative; in production each agent calls live models on your own data, panels and house rubric.</div>`;
+
+  // update stats
+  e.shipped += 1; e.hrs += hrsThis; e.status='idle';
+  if(card) card.classList.remove('working');
+  renderEcon(); renderRoster();
+  running=false;
+}
+
+// ════════════════════ BUILDER ════════════════════
+let draft = { wf:null, mode:null, assign:[], name:'', title:'', cadence:'On-demand', guardrails:['Fact-check every figure','Match house voice'] };
+let stepIdx = 1;
+
+function initBuilder(){ stepIdx=1; draft={ wf:null, mode:null, assign:[], name:'', title:'', cadence:'On-demand', guardrails:['Fact-check every figure','Match house voice'] }; renderBuilder(); }
+
+function renderBuilder(){
+  const steps=[['01','Pick a workflow','What this employee will own'],['02','Assign the tasks','Who does what, in what order'],['03','Define the role','Name, title, cadence, guardrails']];
+  $('builderSteps').innerHTML = steps.map((s,i)=>`<div class="step ${stepIdx===i+1?'active':''}"><div class="n">${s[0]}</div><div class="l">${s[1]}</div><div class="d">${s[2]}</div></div>`).join('');
+  if(stepIdx===1) renderStep1();
+  else if(stepIdx===2) renderStep2();
+  else renderStep3();
+  renderBuilderNav();
+}
+
+function renderStep1(){
+  const tiles = Object.keys(WORKFLOWS).map(id=>{
+    const w=WORKFLOWS[id];
+    return `<div class="wf ${draft.wf===id?'sel':''}" onclick="pickWf('${id}')">
+      <div class="wn">${w.name}</div><div class="wd">${w.desc}</div>
+      <div class="wm">${w.tasks.length} agents · ${w.mode} mode</div></div>`;
+  }).join('');
+  $('builderBody').innerHTML = `<div class="section-label">Choose the workflow</div><div class="wf-grid">${tiles}</div>`;
+}
+function pickWf(id){
+  draft.wf=id; draft.mode=WORKFLOWS[id].mode;
+  draft.assign=WORKFLOWS[id].tasks.map(t=>t.agent);
+  if(!draft.title){ draft.title='AI '+WORKFLOWS[id].name.split(/[&/]/)[0].trim()+' Lead'; }
+  renderBuilder();
+}
+
+function renderStep2(){
+  const w=WORKFLOWS[draft.wf];
+  const opts = ROLE_KEYS.map(r=>`<option value="${r}">${AGENT_ROLES[r].emoji} ${AGENT_ROLES[r].label}</option>`).join('');
+  const rows = w.tasks.map((t,i)=>`<div class="task-row">
+      <div class="tn">${i+1}</div>
+      <div class="tt">${t.task}${t.deps.length?` <span style="color:var(--tert)">· waits for step ${t.deps.map(d=>d+1).join(', ')}</span>`:''}</div>
+      <select onchange="draft.assign[${i}]=this.value">${opts}</select>
+    </div>`).join('');
+  $('builderBody').innerHTML = `
+    <div class="section-label">Assign each task to an agent — this is the job description</div>
+    <div style="margin-bottom:14px">${rows}</div>
+    <div class="field"><label>Execution mode</label>
+      <div class="seg">
+        ${['sequential','dag','parallel'].map(m=>`<button class="${draft.mode===m?'on':''}" onclick="draft.mode='${m}';renderStep2()">${m==='dag'?'Auto (parallel where safe)':m.charAt(0).toUpperCase()+m.slice(1)}</button>`).join('')}
+      </div>
+    </div>`;
+  // set the selects to the assigned agents
+  const selects=$('builderBody').querySelectorAll('select');
+  selects.forEach((s,i)=>{ s.value=draft.assign[i]; });
+}
+
+function renderStep3(){
+  const w=WORKFLOWS[draft.wf];
+  const guards=['Fact-check every figure','Match house voice','Cite every source','Flag low-confidence data'];
+  const sources=['Compass survey panels','Prior Compass studies','Your A-List rubric','Public industry sources'];
+  if(!draft._sources) draft._sources=['Compass survey panels','Prior Compass studies'];
+  $('builderBody').innerHTML = `
+    <div class="section-label">Define the role</div>
+    <div class="field"><label>Employee name</label><input type="text" id="fName" placeholder="e.g. Ava" value="${draft.name}" oninput="draft.name=this.value;refreshPreview()"></div>
+    <div class="field"><label>Job title</label><input type="text" id="fTitle" placeholder="e.g. AI Market Analyst" value="${draft.title}" oninput="draft.title=this.value;refreshPreview()"></div>
+    <div class="field"><label>Cadence</label>
+      <div class="seg">${['On-demand','Daily','Weekly','Monthly'].map(c=>`<button class="${draft.cadence===c?'on':''}" onclick="draft.cadence='${c}';renderStep3()">${c}</button>`).join('')}</div></div>
+    <div class="field"><label>Guardrails</label><div class="checks">${guards.map(g=>`<div class="chk ${draft.guardrails.includes(g)?'on':''}" onclick="toggleArr(draft.guardrails,'${g}');renderStep3()">${draft.guardrails.includes(g)?'✓ ':''}${g}</div>`).join('')}</div></div>
+    <div class="field"><label>Data sources</label><div class="checks">${sources.map(s=>`<div class="chk ${draft._sources.includes(s)?'on':''}" onclick="toggleArr(draft._sources,'${s}');renderStep3()">${draft._sources.includes(s)?'✓ ':''}${s}</div>`).join('')}</div></div>
+    <div class="section-label">Preview</div>
+    <div id="previewEmp"></div>`;
+  refreshPreview();
+}
+function toggleArr(arr,v){ const i=arr.indexOf(v); if(i<0) arr.push(v); else arr.splice(i,1); }
+function refreshPreview(){
+  const w=WORKFLOWS[draft.wf];
+  const team=draft.assign.filter((v,i,a)=>a.indexOf(v)===i).map(r=>`<span class="chip">${AGENT_ROLES[r].emoji} ${AGENT_ROLES[r].label}</span>`).join('');
+  const nm=draft.name||'New hire';
+  const pe=$('previewEmp'); if(!pe) return;
+  pe.innerHTML=`<div class="preview-emp"><div class="emp-top"><div class="avatar">${monogram(nm)}</div>
+    <div><div class="emp-name">${nm}</div><div class="emp-title">${draft.title||'AI employee'}</div></div></div>
+    <div class="emp-owns">Owns: <b>${w.name}</b> · ${draft.cadence} · ${(draft.mode||w.mode).toUpperCase()} mode</div>
+    <div class="team">${team}</div></div>`;
+}
+
+function renderBuilderNav(){
+  let left = stepIdx>1 ? `<button class="btn ghost" onclick="stepIdx--;renderBuilder()">← Back</button>` : `<span></span>`;
+  let right;
+  if(stepIdx===1) right=`<button class="btn primary" ${draft.wf?'':'disabled'} onclick="if(draft.wf){stepIdx=2;renderBuilder()}">Next: assign tasks →</button>`;
+  else if(stepIdx===2) right=`<button class="btn primary" onclick="stepIdx=3;renderBuilder()">Next: define role →</button>`;
+  else right=`<button class="btn primary" onclick="hire()">✓ Hire this AI employee</button>`;
+  $('builderNav').innerHTML = left+right;
+}
+
+function hire(){
+  const w=WORKFLOWS[draft.wf];
+  const name=(draft.name||'').trim()||'New Hire';
+  // register a custom workflow clone with the edited agent assignments + mode
+  const wfId='custom_'+Date.now();
+  WORKFLOWS[wfId]={ name:w.name, deliverable:w.deliverable, mode:draft.mode||w.mode, sample:w.sample, desc:w.desc,
+    tasks:w.tasks.map((t,i)=>({ agent:draft.assign[i]||t.agent, task:t.task, deps:t.deps })) };
+  const id='emp_'+Date.now();
+  EMPLOYEES.push({ id, name, title:draft.title||('AI '+w.name+' Lead'), wf:wfId, shipped:0, hrs:0, fte:0.5, status:'idle', isNew:true });
+  renderEcon(); renderRoster();
+  setView('workforce');
+  setTimeout(()=>{ const c=$('emp-'+id); if(c){ c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.boxShadow='0 0 0 2px var(--accent)'; setTimeout(()=>c.style.boxShadow='',1800);} },300);
+}
+
+// ════════════════════ INIT ════════════════════
+renderEcon();
+renderRoster();
+</script>
+</body>
+</html>
