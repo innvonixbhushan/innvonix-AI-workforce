@@ -3,7 +3,7 @@ This is a working simulation for a stakeholder walkthrough. // All figures, lead
 
 links:
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc
+https://innvonixbhushan.github.io/innvonix-AI-workforce
 
 https://innvonixbhushan.github.io/innvonix-AI-workforc/Compas
 
