@@ -5,14 +5,14 @@ links:
 
 https://innvonixbhushan.github.io/innvonix-AI-workforce
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/Compas
+https://innvonixbhushan.github.io/innvonix-AI-workforce/Compas
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/bluwavai
+https://innvonixbhushan.github.io/innvonix-AI-workforce/bluwavai
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/innvonix
+https://innvonixbhushan.github.io/innvonix-AI-workforce/innvonix
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/monty
+https://innvonixbhushan.github.io/innvonix-AI-workforce/monty
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/saurbhi
+https://innvonixbhushan.github.io/innvonix-AI-workforce/saurbhi
 
-https://innvonixbhushan.github.io/innvonix-AI-workforc/translink
+https://innvonixbhushan.github.io/innvonix-AI-workforce/translink
