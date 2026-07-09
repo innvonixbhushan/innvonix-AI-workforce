@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monty Compost Co — AI Workforce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --soil:#1e1a13;
+    --soil-2:#28221a;
+    --panel:#2f2818;
+    --panel-2:#3a3122;
+    --line:#4a4030;
+    --cream:#f4ecdb;
+    --cream-dim:#c9bc9d;
+    --moss:#8aa564;
+    --moss-dim:#5f7245;
+    --clay:#c17a3f;
+    --clay-dim:#8a5a30;
+    --sensor:#6fa3ad;
+    --amber:#e0b458;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(138,165,100,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(193,122,63,0.08), transparent 55%),
+      var(--soil);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px;}
+  a{color:inherit;}
+
+  /* ---- header ---- */
+  header{padding:44px 0 30px;border-bottom:1px solid var(--line);margin-bottom:36px;}
+  .mark{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+    color:var(--moss);text-transform:uppercase;margin-bottom:18px;
+    border:1px solid var(--moss-dim);padding:5px 10px;border-radius:999px;
+  }
+  .mark::before{content:"●";font-size:8px;color:var(--amber);}
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(32px,5vw,52px);
+    margin:0 0 14px;letter-spacing:-0.01em;color:var(--cream);
+  }
+  h1 em{font-style:italic;color:var(--moss);font-weight:400;}
+  .sub{font-size:16px;color:var(--cream-dim);max-width:640px;margin:0 0 22px;}
+  .lead{font-size:14px;color:var(--cream-dim);max-width:720px;border-left:2px solid var(--clay);padding-left:14px;}
+
+  /* ---- econ strip ---- */
+  .econ{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;margin:34px 0 46px;
+  }
+  .econ .cell{background:var(--panel);padding:20px 22px;}
+  .econ .num{font-family:'Fraunces',serif;font-size:28px;color:var(--amber);}
+  .econ .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--cream-dim);margin-top:4px;}
+
+  /* ---- section headers ---- */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 18px;flex-wrap:wrap;gap:10px;}
+  .section-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:22px;margin:0;}
+  .track-note{font-size:13px;color:var(--cream-dim);}
+  .track{margin-bottom:44px;}
+
+  /* ---- roster grid ---- */
+  .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s;
+    position:relative;
+  }
+  .card:hover{border-color:var(--moss-dim);transform:translateY(-2px);}
+  .card.pro-track{background:linear-gradient(180deg,var(--panel),var(--panel-2));}
+  .card .flag{
+    position:absolute;top:-9px;right:16px;background:var(--clay);color:var(--soil);
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+    padding:3px 8px;border-radius:999px;text-transform:uppercase;font-weight:600;
+  }
+  .card-top{display:flex;gap:12px;align-items:flex-start;}
+  .avatar{
+    width:42px;height:42px;border-radius:10px;background:var(--soil-2);
+    display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+    border:1px solid var(--line);
+  }
+  .card-name{font-family:'Fraunces',serif;font-size:17px;color:var(--cream);}
+  .card-title{font-size:12px;color:var(--moss);margin-top:1px;}
+  .card-desc{font-size:13px;color:var(--cream-dim);flex-grow:1;}
+  .card-stats{display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream-dim);border-top:1px solid var(--line);padding-top:10px;}
+  .card-stats b{color:var(--amber);display:block;font-size:13px;font-weight:500;}
+  .run-btn{
+    background:var(--moss-dim);color:var(--cream);border:none;border-radius:8px;
+    padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+    cursor:pointer;transition:background .15s;
+  }
+  .run-btn:hover{background:var(--moss);}
+  .pro-track .run-btn{background:var(--clay-dim);}
+  .pro-track .run-btn:hover{background:var(--clay);}
+  .card.new-op{border-style:dashed;}
+  .new-op .card-name{color:var(--amber);}
+
+  /* ---- builder trigger ---- */
+  .builder-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:var(--panel-2);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:22px 24px;margin-top:8px;flex-wrap:wrap;
+  }
+  .builder-cta .t{font-family:'Fraunces',serif;font-size:18px;}
+  .builder-cta .d{font-size:13px;color:var(--cream-dim);margin-top:4px;}
+  .btn-outline{
+    background:transparent;border:1px solid var(--moss-dim);color:var(--cream);
+    padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;
+  }
+  .btn-outline:hover{border-color:var(--moss);color:var(--moss);}
+
+  /* ---- modal ---- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,12,8,.72);backdrop-filter:blur(3px);
+    display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--soil-2);border:1px solid var(--line);border-radius:18px;
+    max-width:680px;width:100%;padding:0;overflow:hidden;
+  }
+  .modal-head{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .modal-head h3{font-family:'Fraunces',serif;font-size:20px;margin:0 0 4px;}
+  .modal-head p{font-size:13px;color:var(--cream-dim);margin:0;}
+  .close-x{background:none;border:none;color:var(--cream-dim);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+  .close-x:hover{color:var(--cream);}
+  .modal-body{padding:22px 26px;}
+
+  .prompt-box{
+    background:var(--soil);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--cream-dim);
+    width:100%;resize:vertical;min-height:56px;
+  }
+  .go-btn{
+    margin-top:14px;background:var(--moss);color:var(--soil);border:none;border-radius:9px;
+    padding:11px 20px;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;
+  }
+  .go-btn:hover{filter:brightness(1.08);}
+  .go-btn:disabled{opacity:.5;cursor:default;}
+
+  .feed{margin-top:18px;display:flex;flex-direction:column;gap:8px;min-height:10px;}
+  .feed-row{
+    display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateY(4px);
+    animation:rise .35s forwards;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:11px 13px;
+  }
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+  .feed-emoji{font-size:16px;flex-shrink:0;margin-top:1px;}
+  .feed-agent{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--moss);text-transform:uppercase;letter-spacing:.05em;}
+  .feed-task{font-size:13px;color:var(--cream);margin-top:2px;}
+  .feed-tool{font-size:12px;color:var(--cream-dim);margin-top:5px;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--line);padding-top:5px;}
+  .wave-tag{font-size:10px;color:var(--sensor);font-family:'IBM Plex Mono',monospace;margin:6px 0 0;text-transform:uppercase;letter-spacing:.08em;}
+
+  .deliverable{
+    margin-top:18px;background:var(--soil);border:1px solid var(--amber);border-radius:12px;
+    padding:18px 20px;opacity:0;animation:rise .4s forwards;
+  }
+  .deliverable h4{font-family:'Fraunces',serif;font-size:16px;color:var(--amber);margin:0 0 10px;}
+  .deliverable pre{
+    white-space:pre-wrap;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:var(--cream-dim);margin:0;line-height:1.65;
+  }
+  .deliverable .human{
+    margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--sensor);display:flex;gap:6px;align-items:center;
+  }
+
+  /* ---- builder steps ---- */
+  .steps{display:flex;gap:6px;margin-bottom:18px;}
+  .step-dot{flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .step-dot.active{background:var(--moss);}
+  .opt-list{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;
+    background:var(--panel);transition:border-color .15s;
+  }
+  .opt:hover{border-color:var(--moss-dim);}
+  .opt.sel{border-color:var(--moss);background:var(--panel-2);}
+  .opt .n{font-family:'Fraunces',serif;font-size:14.5px;}
+  .opt .d{font-size:12px;color:var(--cream-dim);margin-top:2px;}
+  .field{margin-bottom:14px;}
+  .field label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-dim);display:block;margin-bottom:6px;}
+  .field input,.field select{
+    width:100%;background:var(--soil);border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;color:var(--cream);font-family:'Inter',sans-serif;font-size:13.5px;
+  }
+  .step-nav{display:flex;justify-content:space-between;margin-top:20px;gap:10px;}
+
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:22px;font-size:12px;color:var(--cream-dim);}
+  footer b{color:var(--cream);}
+
+  @media (max-width:640px){
+    .econ{grid-template-columns:repeat(2,1fr);}
+    .roster{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">AI Workforce Prototype</div>
+    <h1>Monty Compost Co runs on <em>an AI workforce</em>, not a headcount plan.</h1>
+    <p class="sub">Eight operators, each a small team of specialist agents, covering the loops that currently eat the most hours across Monty Home support and marketing, and Monty Pro's industrial sales motion.</p>
+    <p class="lead">This is a working simulation for a stakeholder walkthrough. Every number, ticket, and dataset below is illustrative. Nothing here is connected to Monty's live systems, and every deliverable is written to be reviewed by a person before it goes out.</p>
+  </header>
+
+  <div class="econ" id="econStrip"></div>
+
+  <div class="track" id="track-home">
+    <div class="section-head">
+      <h2>🏡 Monty Home operators</h2>
+      <span class="track-note">Consumer support, retention and growth</span>
+    </div>
+    <div class="roster" id="roster-home"></div>
+  </div>
+
+  <div class="track" id="track-pro">
+    <div class="section-head">
+      <h2>🏭 Monty Pro operators</h2>
+      <span class="track-note">Industrial and municipal composting sales</span>
+    </div>
+    <div class="roster" id="roster-pro"></div>
+  </div>
+
+  <div class="builder-cta">
+    <div>
+      <div class="t">Have another loop that eats a Tuesday afternoon?</div>
+      <div class="d">Clone one of the eight workflows above into a new operator in three steps.</div>
+    </div>
+    <button class="btn-outline" onclick="openBuilder()">+ Build a new operator</button>
+  </div>
+
+  <footer>
+    <p><b>Illustrative prototype.</b> All figures, tickets, telemetry, customer segments and deliverable text are placeholders generated for this demo, not real Monty Compost Co data. This tool is not connected to Shopify, Monty Mobile, or any live warranty, affiliate, or CRM system.</p>
+    <p><b>Human in the loop by design.</b> Every operator ends with a QA step, and every deliverable is drafted for a person to review, edit, and approve before it reaches a customer, an affiliate, or a council.</p>
+  </footer>
+</div>
+
+<!-- RUN MODAL -->
+<div class="overlay" id="runOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="runTitle"></h3>
+        <p id="runSub"></p>
+      </div>
+      <button class="close-x" onclick="closeModal('runOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-dim);display:block;margin-bottom:6px;">Input</label>
+      <textarea class="prompt-box" id="runPrompt"></textarea>
+      <button class="go-btn" id="runGoBtn" onclick="runOperator()">Run operator</button>
+      <div class="feed" id="runFeed"></div>
+      <div id="runDeliverable"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BUILDER MODAL -->
+<div class="overlay" id="buildOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Build a new operator</h3>
+        <p>Clone a workflow, name it, set a cadence.</p>
+      </div>
+      <button class="close-x" onclick="closeModal('buildOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="steps"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
+      <div id="buildStep"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const AGENT_ROLES = {
+  researcher:{emoji:'🔍',label:'Researcher',tools:['review_scan','market_scan','seo_keyword_scan','facility_research','save']},
+  compost_scientist:{emoji:'🌱',label:'Compost Scientist',tools:['pile_health_model','compost_tip_gen','topic_scan','tech_fit_check','solution_spec','save']},
+  hardware_engineer:{emoji:'🔧',label:'Hardware Engineer',tools:['sensor_diagnostic','fault_tree','save']},
+  data_analyst:{emoji:'📊',label:'Data Analyst',tools:['telemetry_pull','segment_customers','payout_calc','fleet_stats','save']},
+  support_specialist:{emoji:'💬',label:'Support Specialist',tools:['ticket_classify','sla_check','save']},
+  copywriter:{emoji:'✍️',label:'Copywriter',tools:['draft_response','draft_digest','draft_email_seq','localize_copy','draft_article','draft_qual_email','draft_rfp_doc','save']},
+  qa_reviewer:{emoji:'✅',label:'QA Reviewer',tools:['tone_check','compliance_check','fact_check','payout_verify','save']},
+  logistics_coordinator:{emoji:'📦',label:'Logistics Coordinator',tools:['shipping_model','fulfillment_check','save']},
+  affiliate_manager:{emoji:'🤝',label:'Affiliate Manager',tools:['affiliate_review','application_screen','save']},
+  compliance_specialist:{emoji:'📋',label:'Compliance Specialist',tools:['customs_check','battery_shipping_check','certification_check','save']},
+  b2b_sales_analyst:{emoji:'🏭',label:'B2B Sales Analyst',tools:['icp_score','rfp_parse','save']},
+  social_media_strategist:{emoji:'📱',label:'Social Strategist',tools:['ugc_package','social_snippet_gen','save']}
+};
+
+const TOOLS = {
+  ticket_classify:()=>'Ticket routed → hardware/sensor category, warranty window checked against order date.',
+  sla_check:()=>'SLA clock started: first response due in 4h, resolution target 48h.',
+  telemetry_pull:()=>'Pulled 30-day telemetry: 2,880 expected readings, 96 missing, gap starts day 24.',
+  segment_customers:()=>'Segmented 368 customers into 3 lifecycle groups by cart and sync activity.',
+  payout_calc:()=>'Commission run: AU$14,230 tracked sales → AU$2,134 payable at 15% tier.',
+  fleet_stats:()=>'Pulled anonymized stats across 2,400 piles for the current content angle.',
+  sensor_diagnostic:()=>'Fault-tree result: Bluetooth pairing timeout pattern, batch Feb–Mar 2025.',
+  fault_tree:()=>'Battery cycle count normal, no thermal fault flags in the last 90 days.',
+  pile_health_model:()=>'Pile health model run: moisture and temperature both within expected range.',
+  compost_tip_gen:()=>'Generated 3 stage-relevant tips for the flagged segment.',
+  topic_scan:()=>'Flagged plateau pattern around day 18–22 correlating with moisture drop below 40%.',
+  tech_fit_check:()=>'Sensor network fit: strong for windrow ops, pilot with 2 rows recommended first.',
+  solution_spec:()=>'Spec drafted: 3 nodes per windrow, 15-min cadence, dashboard access included.',
+  draft_response:()=>'Drafted customer resolution copy, plain-language root cause plus fix steps.',
+  draft_digest:()=>'Drafted digest summarizing top performers and payout totals.',
+  draft_email_seq:()=>'Drafted 3-segment email sequence with tailored subject lines.',
+  localize_copy:()=>'Localized core product messaging for target market tone and idiom.',
+  draft_article:()=>'Drafted ~900-word article around the identified content angle.',
+  draft_qual_email:()=>'Drafted next-step email proposing a site scoping call.',
+  draft_rfp_doc:()=>'Drafted RFP response combining technical approach and compliance notes.',
+  tone_check:()=>'Tone check passed: warm, plain-language, no overpromising on timelines.',
+  compliance_check:()=>'Compliance check passed: warranty terms and coverage window quoted correctly.',
+  fact_check:()=>'Fact-check passed: claims traced back to source telemetry and fleet stats.',
+  payout_verify:()=>'Payout figures reconciled against tracked affiliate sales, no discrepancy.',
+  review_scan:()=>'Scanned 47 store reviews, 12 Google reviews, 89 social mentions this week.',
+  market_scan:()=>'Scanned demand signals and 4 competitor products in the target market.',
+  seo_keyword_scan:()=>'Target keyword identified: moderate volume, low competition.',
+  facility_research:()=>'Found facility profile: council-run, 6 active windrows, no prior tender history.',
+  ugc_package:()=>'Packaged top 3 assets into a carousel brief for next week\'s social post.',
+  social_snippet_gen:()=>'Cut 3 short-form snippets from the source article.',
+  affiliate_review:()=>'Reviewed 18 new applications against audience-fit criteria.',
+  application_screen:()=>'11 approved, 7 declined for audience mismatch.',
+  shipping_model:()=>'Modeled landed cost: AU$38/unit via existing EU 3PL, 7–10 day window.',
+  fulfillment_check:()=>'Confirmed existing EU fulfillment can absorb volume without new inventory.',
+  customs_check:()=>'Customs classification confirmed under standard consumer electronics code.',
+  battery_shipping_check:()=>'UN38.3 documentation already on file from prior EU launch.',
+  certification_check:()=>'No additional certification required beyond existing CE marking.',
+  icp_score:()=>'ICP score: 78/100 — strong volume fit, moderate monitoring maturity.',
+  rfp_parse:()=>'Parsed scope: 6 sites, monthly reporting, 3-year data retention, 21-day deadline.',
+  save:()=>'Output saved to the operator\'s deliverable draft.'
+};
+
+const WORKFLOWS = {
+  warranty_support:{
+    name:'warranty_support', title:'Warranty & Support Triage', mode:'sequential', track:'home', tag:'flagship',
+    deliverable:'Resolution Packet',
+    desc:'Diagnoses a support ticket end to end and drafts a ready-to-send resolution.',
+    sample:"Customer reports Monty Monitor showing 'no reading' after 3 weeks. Unit purchased 14 months ago, order #MC-88213.",
+    tasks:[
+      {agent:'support_specialist', task:"Classify the ticket (hardware fault, sensor drift, or usage issue) and check the warranty window against order #MC-88213.", deps:[]},
+      {agent:'data_analyst', task:"Pull the last 30 days of telemetry (temperature, humidity, gas) for the unit to look for gaps or anomalies.", deps:[0]},
+      {agent:'hardware_engineer', task:"Run a fault-tree diagnostic on the transmission gap and battery cycle history.", deps:[1]},
+      {agent:'compost_scientist', task:"Check whether pile conditions could explain the dropout rather than a hardware fault.", deps:[1]},
+      {agent:'copywriter', task:"Draft the customer-facing resolution: root cause in plain language, fix steps, and a warranty replacement offer if applicable.", deps:[2,3]},
+      {agent:'qa_reviewer', task:"Review tone and confirm the warranty terms are quoted correctly against the 14-month coverage window.", deps:[4]}
+    ]
+  },
+  review_harvest:{
+    name:'review_harvest', title:'Review & Testimonial Mining', mode:'dag', track:'home',
+    deliverable:'UGC Digest',
+    desc:'Surfaces new reviews and turns the strongest ones into ready-to-use marketing assets.',
+    sample:"Sweep this week's reviews and social mentions across the store, TikTok and Instagram for testimonial-worthy material.",
+    tasks:[
+      {agent:'researcher', task:"Scan store reviews, Google reviews, and social mentions posted in the last 7 days.", deps:[]},
+      {agent:'copywriter', task:"Draft short, paraphrased testimonial pull-quotes from the strongest reviews, flagged for permission status.", deps:[0]},
+      {agent:'social_media_strategist', task:"Package the top 3 into a UGC carousel brief for next week's social post.", deps:[0]},
+      {agent:'qa_reviewer', task:"Check each testimonial candidate for permission status and factual accuracy before it moves to marketing.", deps:[1,2]}
+    ]
+  },
+  affiliate_ops:{
+    name:'affiliate_ops', title:'Affiliate Program Operations', mode:'sequential', track:'home',
+    deliverable:'Affiliate Digest',
+    desc:"Handles the affiliate program's recurring admin loop end to end.",
+    sample:"Run the monthly affiliate cycle: review new applications, calculate commissions, and send performance summaries.",
+    tasks:[
+      {agent:'affiliate_manager', task:"Screen new affiliate applications against the program's audience-fit criteria.", deps:[]},
+      {agent:'data_analyst', task:"Calculate commission payouts for the month from tracked affiliate sales data.", deps:[]},
+      {agent:'copywriter', task:"Draft the monthly affiliate performance digest with top performers and a payout summary.", deps:[0,1]},
+      {agent:'qa_reviewer', task:"Verify payout figures reconcile with sales data and check the digest for accuracy before send.", deps:[2]}
+    ]
+  },
+  lifecycle_email:{
+    name:'lifecycle_email', title:'Lifecycle Email Personalization', mode:'dag', track:'home',
+    deliverable:'Email Sequence',
+    desc:'Segments customers by behaviour and drafts personalized compost-coaching emails.',
+    sample:"Build this week's lifecycle batch for customers who abandoned cart or haven't synced Monty Mobile in 10+ days.",
+    tasks:[
+      {agent:'data_analyst', task:"Segment customers by cart-abandon status and Monty Mobile sync recency.", deps:[]},
+      {agent:'compost_scientist', task:"Generate a relevant compost tip per segment based on the likely stage of their pile.", deps:[0]},
+      {agent:'copywriter', task:"Draft the lifecycle email sequence per segment, pairing the tip with a clear next action.", deps:[0,1]},
+      {agent:'qa_reviewer', task:"Check brand tone, subject lines, and unsubscribe compliance before scheduling.", deps:[2]}
+    ]
+  },
+  market_expansion:{
+    name:'market_expansion', title:'International Market Readiness', mode:'sequential', track:'home',
+    deliverable:'Market Entry Brief',
+    desc:'Builds the go/no-go brief for entering a new shipping market.',
+    sample:"Assess readiness to launch Monty Monitor direct-to-consumer in Sweden.",
+    tasks:[
+      {agent:'researcher', task:"Research composting habits, demand signals, and competitor presence in the target market.", deps:[]},
+      {agent:'compliance_specialist', task:"Check customs classification, battery-shipping rules, and any certification needed for the market.", deps:[]},
+      {agent:'logistics_coordinator', task:"Model landed shipping cost and fulfillment options for the target market.", deps:[1]},
+      {agent:'copywriter', task:"Localize core product messaging and store copy for the new market.", deps:[0]},
+      {agent:'qa_reviewer', task:"Final check that compliance requirements and shipping costs are reflected accurately in the brief.", deps:[2,3]}
+    ]
+  },
+  content_engine:{
+    name:'content_engine', title:'Compost Insights Content Engine', mode:'dag', track:'home',
+    deliverable:'Article + Social Pack',
+    desc:'Mines anonymized fleet data for a content angle and produces a ready-to-publish package.',
+    sample:"Turn this month's aggregate fleet sensor trends into a blog article and social snippets.",
+    tasks:[
+      {agent:'compost_scientist', task:"Identify a trending compost-science angle from aggregate fleet sensor patterns this month.", deps:[]},
+      {agent:'researcher', task:"Research SEO keywords and competitor content for the chosen angle.", deps:[]},
+      {agent:'data_analyst', task:"Pull supporting anonymized fleet statistics to back the article's claims.", deps:[0]},
+      {agent:'copywriter', task:"Draft the blog article using the angle, stats, and keyword targets.", deps:[0,1,2]},
+      {agent:'social_media_strategist', task:"Cut the article into 3 social snippets for Instagram and TikTok.", deps:[3]},
+      {agent:'qa_reviewer', task:"Fact-check claims against the data and edit for accuracy and tone.", deps:[3,4]}
+    ]
+  },
+  pro_lead_qualification:{
+    name:'pro_lead_qualification', title:'Monty Pro Lead Qualification', mode:'sequential', track:'pro',
+    deliverable:'Qualification Summary',
+    desc:'Scores and researches an inbound Monty Pro enquiry, then drafts the next-step email.',
+    sample:"Qualify an inbound enquiry from a regional council composting facility processing 40 tonnes/week.",
+    tasks:[
+      {agent:'b2b_sales_analyst', task:"Score the lead against the Monty Pro ideal customer profile (facility type, volume, monitoring maturity).", deps:[]},
+      {agent:'researcher', task:"Research the facility's current composting operation, scale, and any public tender history.", deps:[]},
+      {agent:'compost_scientist', task:"Assess technical fit: pile volume, turning method, and where the sensor network adds most value.", deps:[1]},
+      {agent:'copywriter', task:"Draft the qualification summary and a next-step email proposing a site scoping call.", deps:[0,2]},
+      {agent:'qa_reviewer', task:"Review for accuracy and tone before the summary goes to the sales lead.", deps:[3]}
+    ]
+  },
+  pro_rfp_response:{
+    name:'pro_rfp_response', title:'Monty Pro RFP Response', mode:'sequential', track:'pro',
+    deliverable:'RFP Response Draft',
+    desc:'Turns an RFP into a technical proposal draft ready for sales review.',
+    sample:"Draft a response to a municipal council's RFP for continuous compost monitoring across 6 windrow sites.",
+    tasks:[
+      {agent:'b2b_sales_analyst', task:"Parse the RFP for scope, evaluation criteria, and submission requirements.", deps:[]},
+      {agent:'compost_scientist', task:"Define the technical monitoring solution: sensor placement, coverage per windrow, and data cadence.", deps:[0]},
+      {agent:'compliance_specialist', task:"Confirm which certifications and data-handling requirements the RFP calls for are met.", deps:[0]},
+      {agent:'copywriter', task:"Draft the RFP response document combining the technical solution and compliance confirmations.", deps:[1,2]},
+      {agent:'qa_reviewer', task:"Final review against the RFP's evaluation criteria before submission.", deps:[3]}
+    ]
+  }
+};
+
+const DTITLE = {
+  warranty_support:'Resolution Packet — Ticket #MC-88213-R1',
+  review_harvest:'UGC Digest — Week of Jul 1',
+  affiliate_ops:'Affiliate Digest — June Cycle',
+  lifecycle_email:'Email Sequence — This Week\'s Batch',
+  market_expansion:'Market Entry Brief — Sweden',
+  content_engine:'Article + Social Pack — Compost Plateau',
+  pro_lead_qualification:'Qualification Summary — Enquiry #PRO-0412',
+  pro_rfp_response:'RFP Response Draft — 6 Windrow Sites'
+};
+
+const FINAL = {
+warranty_support:`Unit: Monty Monitor, purchased 14 months ago (within the 24-month warranty window)
+Issue: Gas/humidity readings stopped syncing for 6 days; temperature channel still reporting.
+
+Root cause: fault-tree diagnostic shows repeated Bluetooth pairing timeouts consistent with the humidity sensor's known batch pattern (units shipped Feb-Mar 2025), not a pile condition issue. Probe placement checked out fine on the last synced readings.
+
+Resolution offered:
+- Replacement monitor module dispatched under warranty, no charge
+- Customer keeps existing probe and app history
+- Interim tip: move Monty 5cm from the pile's edge to reduce condensation on the sensor housing
+
+Estimated resolution: same-day dispatch, replacement arrives in 4-6 business days.
+
+NOTE: illustrative example. All figures, ticket numbers, and diagnostics are placeholders and would be generated from live telemetry and warranty records in production, with a human support agent reviewing before send.`,
+
+review_harvest:`New reviews scanned: 47 (store), 12 (Google), 89 mentions (TikTok/Instagram)
+Testimonial-ready pulls: 6
+
+Top 3 for this week's carousel:
+1. A verified 5-star store review praising how much clearer turning timing became
+2. A TikTok unboxing (61k views) highlighting the app's health-check screen
+3. A before/after pile photo pair from Instagram tagged #montycompost
+
+Flagged for follow-up: 2 reviews mention app sync lag on Android, routed to the product team.
+
+NOTE: illustrative example. Quotes are paraphrased placeholders; real testimonial use requires the reviewer's explicit permission and legal sign-off before publishing.`,
+
+affiliate_ops:`New applications reviewed: 18 | Approved: 11 | Declined (audience mismatch): 7
+Total tracked affiliate sales: AU$14,230
+Commission payable: AU$2,134 (15% standard tier)
+
+Top performers:
+1. Garden-focused creator — AU$3,180 in tracked sales
+2. Compost community blog — AU$2,540 in tracked sales
+3. Low-waste lifestyle creator — AU$1,960 in tracked sales
+
+Payout batch ready for finance review before the 15th.
+
+NOTE: illustrative example. Sales and payout figures are placeholders; final payouts require finance sign-off and reconciliation against Shopify order data.`,
+
+lifecycle_email:`Segment A — cart abandoned, no purchase (n=214): 2-email sequence, leads with "what your first week with Monty looks like"
+Segment B — no app sync 10+ days, owns Monty (n=96): 1 email, "your compost might be stalling" with a 2-tap troubleshooting tip
+Segment C — synced daily, 60+ days (n=58): 1 email inviting a review plus the compost-ready checklist
+
+Projected open-rate uplift vs a generic blast: +4-6 points, based on prior segment tests.
+
+NOTE: illustrative example. Segment sizes and projected uplift are placeholders; a marketing lead reviews copy and send timing before scheduling.`,
+
+market_expansion:`Demand signal: home composting adoption trending up alongside Sweden's municipal food-waste separation mandate; moderate competitor presence, mostly analog bins with no monitoring layer.
+
+Compliance: product falls under the standard consumer electronics customs code; internal battery already has UN38.3 documentation on file from the EU launch. No additional certification identified beyond existing CE marking.
+
+Logistics: landed cost per unit via the existing EU 3PL estimated at AU$38 (freight and duties), 7-10 day delivery window.
+
+Messaging: local copy leans on the mandate rather than novelty framing.
+
+Recommendation: proceed to a soft launch via existing EU fulfillment before dedicated Swedish inventory.
+
+NOTE: illustrative example. All figures and regulatory notes are placeholders; a compliance and logistics lead must confirm current requirements before launch.`,
+
+content_engine:`Angle: aggregate fleet data shows a common temperature plateau around day 18-22 across roughly 2,400 anonymized piles, correlating with a moisture drop below 40%.
+Keyword target: moderate volume, low competition.
+
+Article: roughly 900 words, opens with the plateau pattern, explains the moisture-microbe link, closes with a 3-step fix using Monty Mobile's health check.
+
+Social snippets:
+1. Instagram carousel: "3 signs your compost stalled, and the 1-tap fix"
+2. TikTok script: 30-second plateau explainer over app footage
+3. Reel caption: quick moisture-check tip
+
+NOTE: illustrative example. Fleet statistics are anonymized, aggregated placeholders; a content lead fact-checks before publishing.`,
+
+pro_lead_qualification:`ICP fit score: 78/100 — strong volume fit (40 tonnes/week), moderate monitoring maturity (currently manual temperature logging only)
+
+Facility profile: open windrow operation, 6 active rows, council-run, no prior tender history found for monitoring technology.
+
+Technical fit: the multi-point sensor network suits windrow operations well; recommend starting with a 2-row pilot before a full 6-row rollout.
+
+Next step drafted: email proposing a 30-minute site scoping call within 2 weeks, with a 2-row pilot quote to follow.
+
+NOTE: illustrative example. Score, facility details, and quote structure are placeholders; the Monty Pro sales lead confirms fit before outreach.`,
+
+pro_rfp_response:`Scope parsed: continuous temperature/moisture/gas monitoring across 6 sites, monthly reporting, 3-year data retention, submission due in 21 days.
+
+Proposed solution: 3 sensor nodes per windrow (18 total), 15-minute reporting cadence, dashboard access for council staff, automated monthly compliance report.
+
+Compliance: data retention and access-control requirements met by existing data policy; certification requirements under review with the compliance lead.
+
+Draft sections completed: technical approach, implementation timeline (6 weeks), data and reporting, pricing placeholder pending finance input.
+
+NOTE: illustrative example. Solution specs and timeline are placeholders; compliance sign-off and finance pricing are required before submission.`
+};
+
+const EMPLOYEES = [
+  {id:'emp1', name:'Sana', title:'Support Triage Operator', wf:'warranty_support', handled:'182 tickets/mo', hrs:14, win:'2.1x faster resolution', status:'idle'},
+  {id:'emp2', name:'Reeve', title:'Review Mining Operator', wf:'review_harvest', handled:'340 reviews/mo', hrs:6, win:'6 testimonials/week', status:'idle'},
+  {id:'emp3', name:'Coda', title:'Affiliate Ops Operator', wf:'affiliate_ops', handled:'1 cycle/mo', hrs:9, win:'AU$2.1k payouts/mo', status:'idle'},
+  {id:'emp4', name:'Wick', title:'Lifecycle Email Operator', wf:'lifecycle_email', handled:'368 sends/wk', hrs:7, win:'+5pt open rate', status:'idle'},
+  {id:'emp5', name:'Nomi', title:'Market Readiness Operator', wf:'market_expansion', handled:'1 brief/market', hrs:11, win:'3 markets/quarter', status:'idle'},
+  {id:'emp6', name:'Pixel', title:'Content Engine Operator', wf:'content_engine', handled:'4 articles/mo', hrs:13, win:'2.3x organic traffic', status:'idle'},
+  {id:'emp7', name:'Ridge', title:'Pro Lead Qualification Operator', wf:'pro_lead_qualification', handled:'26 leads/mo', hrs:8, win:'71% qualified rate', status:'idle'},
+  {id:'emp8', name:'Voss', title:'Pro RFP Operator', wf:'pro_rfp_response', handled:'3 RFPs/mo', hrs:16, win:'21-day to 4-day draft', status:'idle'}
+];
+
+const CONFIG = {
+  trackLabels:{home:'Monty Home', pro:'Monty Pro'},
+  econLabels:['Operators live','Hours/week reclaimed','Workflows automated','Avg. QA pass rate']
+};
+
+/* ============ RENDER ============ */
+let customOperators = [];
+
+function econStrip(){
+  const totalHrs = EMPLOYEES.reduce((s,e)=>s+e.hrs,0) + customOperators.reduce((s,e)=>s+e.hrs,0);
+  const el = document.getElementById('econStrip');
+  const vals = [
+    [String(EMPLOYEES.length + customOperators.length), CONFIG.econLabels[0]],
+    [totalHrs+'h', CONFIG.econLabels[1]],
+    [String(Object.keys(WORKFLOWS).length), CONFIG.econLabels[2]],
+    ['96%', CONFIG.econLabels[3]]
+  ];
+  el.innerHTML = vals.map(v=>`<div class="cell"><div class="num">${v[0]}</div><div class="lbl">${v[1]}</div></div>`).join('');
+}
+
+function renderCard(emp, trackKey){
+  const wf = WORKFLOWS[emp.wf];
+  const isPro = trackKey==='pro';
+  return `
+  <div class="card ${isPro?'pro-track':''}">
+    ${wf.tag==='flagship' ? '<div class="flag">Flagship</div>' : ''}
+    <div class="card-top">
+      <div class="avatar">${AGENT_ROLES[wf.tasks[0].agent].emoji}</div>
+      <div>
+        <div class="card-name">${emp.name}</div>
+        <div class="card-title">${emp.title}</div>
+      </div>
+    </div>
+    <div class="card-desc">${wf.desc}</div>
+    <div class="card-stats">
+      <div><b>${emp.handled}</b>handled</div>
+      <div><b>${emp.hrs}h/wk</b>reclaimed</div>
+      <div><b>${emp.win}</b>result</div>
+    </div>
+    <button class="run-btn" onclick="openRun('${emp.wf}')">Run ${wf.deliverable} →</button>
+  </div>`;
+}
+
+function renderRoster(){
+  document.getElementById('roster-home').innerHTML =
+    EMPLOYEES.filter(e=>WORKFLOWS[e.wf].track==='home').map(e=>renderCard(e,'home')).join('') +
+    customOperators.filter(e=>WORKFLOWS[e.wf].track==='home').map(e=>renderCard(e,'home')).join('');
+  document.getElementById('roster-pro').innerHTML =
+    EMPLOYEES.filter(e=>WORKFLOWS[e.wf].track==='pro').map(e=>renderCard(e,'pro')).join('') +
+    customOperators.filter(e=>WORKFLOWS[e.wf].track==='pro').map(e=>renderCard(e,'pro')).join('');
+  econStrip();
+}
+
+/* ============ RUN ENGINE ============ */
+let currentWF = null;
+
+function openRun(wfKey){
+  currentWF = wfKey;
+  const wf = WORKFLOWS[wfKey];
+  document.getElementById('runTitle').textContent = wf.title;
+  document.getElementById('runSub').textContent = wf.desc;
+  document.getElementById('runPrompt').value = wf.sample;
+  document.getElementById('runFeed').innerHTML = '';
+  document.getElementById('runDeliverable').innerHTML = '';
+  document.getElementById('runGoBtn').disabled = false;
+  document.getElementById('runGoBtn').textContent = 'Run operator';
+  document.getElementById('runOverlay').classList.add('open');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function computeWaves(tasks){
+  const wave = new Array(tasks.length).fill(0);
+  tasks.forEach((t,i)=>{
+    if(t.deps.length===0){ wave[i]=0; }
+    else { wave[i] = Math.max(...t.deps.map(d=>wave[d])) + 1; }
+  });
+  return wave;
+}
+
+function runOperator(){
+  const wf = WORKFLOWS[currentWF];
+  const btn = document.getElementById('runGoBtn');
+  const feed = document.getElementById('runFeed');
+  const deliverEl = document.getElementById('runDeliverable');
+  feed.innerHTML = '';
+  deliverEl.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+
+  const waves = computeWaves(wf.tasks);
+  let delay = 150;
+  let lastWave = -1;
+
+  wf.tasks.forEach((t, i)=>{
+    const w = waves[i];
+    const rowDelay = delay;
+    setTimeout(()=>{
+      if(wf.mode==='dag' && w !== lastWave){
+        lastWave = w;
+        const tag = document.createElement('div');
+        tag.className = 'wave-tag';
+        tag.textContent = 'Wave ' + (w+1) + (w===0 ? ' — parallel start' : '');
+        feed.appendChild(tag);
+      }
+      const agent = AGENT_ROLES[t.agent];
+      const toolKey = agent.tools[Math.floor(Math.random()*(agent.tools.length-1))];
+      const row = document.createElement('div');
+      row.className = 'feed-row';
+      row.innerHTML = `
+        <div class="feed-emoji">${agent.emoji}</div>
+        <div style="flex:1">
+          <div class="feed-agent">${agent.label}</div>
+          <div class="feed-task">${t.task}</div>
+          <div class="feed-tool">→ ${TOOLS[toolKey]()}</div>
+        </div>`;
+      feed.appendChild(row);
+      feed.scrollTop = feed.scrollHeight;
+    }, rowDelay);
+    delay += (wf.mode==='dag' ? 420 : 520);
+  });
+
+  setTimeout(()=>{
+    btn.textContent = 'Run again';
+    btn.disabled = false;
+    deliverEl.innerHTML = `
+      <div class="deliverable">
+        <h4>📄 ${DTITLE[currentWF]}</h4>
+        <pre>${FINAL[currentWF]}</pre>
+        <div class="human">🧑‍🌾 Drafted for review — a Monty team member approves before this reaches a customer, affiliate, or council.</div>
+      </div>`;
+  }, delay + 250);
+}
+
+/* ============ BUILDER ============ */
+let buildState = {step:1, base:null, name:'', cadence:'Weekly'};
+
+function openBuilder(){
+  buildState = {step:1, base:null, name:'', cadence:'Weekly'};
+  renderBuildStep();
+  document.getElementById('buildOverlay').classList.add('open');
+}
+
+function renderBuildStep(){
+  for(let i=1;i<=3;i++) document.getElementById('dot'+i).classList.toggle('active', i<=buildState.step);
+  const el = document.getElementById('buildStep');
+
+  if(buildState.step===1){
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--cream-dim);margin-top:0;">Step 1 — pick the workflow this operator will run.</p>
+      <div class="opt-list">
+        ${Object.values(WORKFLOWS).map(w=>`
+          <div class="opt ${buildState.base===w.name?'sel':''}" onclick="selectBase('${w.name}')">
+            <div class="n">${w.title}</div>
+            <div class="d">${w.desc}</div>
+          </div>`).join('')}
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button class="run-btn" ${buildState.base?'':'disabled style="opacity:.5"'} onclick="buildState.step=2;renderBuildStep()">Next →</button>
+      </div>`;
+  } else if(buildState.step===2){
+    const w = WORKFLOWS[buildState.base];
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--cream-dim);margin-top:0;">Step 2 — name the operator and set a cadence, based on <b style="color:var(--cream)">${w.title}</b>.</p>
+      <div class="field">
+        <label>Operator name</label>
+        <input id="opName" type="text" placeholder="e.g. Loam" value="${buildState.name}">
+      </div>
+      <div class="field">
+        <label>Run cadence</label>
+        <select id="opCadence">
+          <option ${buildState.cadence==='Daily'?'selected':''}>Daily</option>
+          <option ${buildState.cadence==='Weekly'?'selected':''}>Weekly</option>
+          <option ${buildState.cadence==='Monthly'?'selected':''}>Monthly</option>
+          <option ${buildState.cadence==='On trigger'?'selected':''}>On trigger</option>
+        </select>
+      </div>
+      <div class="step-nav">
+        <button class="btn-outline" onclick="buildState.step=1;renderBuildStep()">← Back</button>
+        <button class="run-btn" onclick="confirmStep2()">Next →</button>
+      </div>`;
+  } else if(buildState.step===3){
+    const w = WORKFLOWS[buildState.base];
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--cream-dim);margin-top:0;">Step 3 — confirm and add to the roster.</p>
+      <div class="opt sel" style="cursor:default">
+        <div class="n">${buildState.name || 'Untitled Operator'}</div>
+        <div class="d">Runs <b style="color:var(--cream)">${w.title}</b> · ${buildState.cadence} · ${CONFIG.trackLabels[w.track]} track</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-outline" onclick="buildState.step=2;renderBuildStep()">← Back</button>
+        <button class="run-btn" onclick="finishBuild()">Add operator</button>
+      </div>`;
+  }
+}
+
+function selectBase(key){ buildState.base = key; renderBuildStep(); }
+function confirmStep2(){
+  buildState.name = document.getElementById('opName').value.trim();
+  buildState.cadence = document.getElementById('opCadence').value;
+  buildState.step = 3;
+  renderBuildStep();
+}
+function finishBuild(){
+  const w = WORKFLOWS[buildState.base];
+  customOperators.push({
+    id:'custom'+Date.now(),
+    name: buildState.name || 'New Operator',
+    title: buildState.cadence + ' · ' + CONFIG.trackLabels[w.track],
+    wf: buildState.base,
+    handled:'—', hrs:Math.max(2,Math.round(w.tasks.length*1.8)), win:'New — establishing baseline',
+    status:'idle'
+  });
+  renderRoster();
+  closeModal('buildOverlay');
+}
+
+/* init */
+renderRoster();
+</script>
+</body>
+</html>
