@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innvonix — AI Workforce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12151b;
+    --panel:#1a1e26;
+    --panel-2:#212630;
+    --line:#2b313d;
+    --text:#eef1f6;
+    --text-dim:#8d96a5;
+    --violet:#8b7cf6;
+    --violet-dim:#5b4fc4;
+    --amber:#f0a94f;
+    --amber-dim:#a8722e;
+    --mint:#4fd6a0;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% 0%, rgba(139,124,246,.10), transparent 55%),
+      radial-gradient(circle at 100% 10%, rgba(240,169,79,.08), transparent 50%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 26px),
+      var(--ink);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px;}
+
+  header{padding:44px 0 30px;border-bottom:1px solid var(--line);margin-bottom:36px;}
+  .mark{
+    display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.12em;color:var(--mint);text-transform:uppercase;
+    border:1px solid #2b4a3d;padding:5px 10px;border-radius:6px;margin-bottom:18px;background:rgba(79,214,160,.06);
+  }
+  .mark::before{content:"$";color:var(--mint);}
+  h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(30px,4.6vw,48px);
+    margin:0 0 14px;letter-spacing:-0.01em;
+  }
+  h1 span.hi{color:var(--violet);}
+  .sub{font-size:16px;color:var(--text-dim);max-width:660px;margin:0 0 20px;}
+  .lead{font-size:13.5px;color:var(--text-dim);max-width:720px;border-left:2px solid var(--amber);padding-left:14px;font-family:'IBM Plex Mono',monospace;line-height:1.7;}
+
+  .econ{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;margin:34px 0 46px;
+  }
+  .econ .cell{background:var(--panel);padding:20px 22px;}
+  .econ .num{font-family:'Space Grotesk',sans-serif;font-size:27px;color:var(--violet);}
+  .econ .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-top:4px;}
+
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 18px;flex-wrap:wrap;gap:10px;}
+  .section-head h2{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:21px;margin:0;}
+  .track-note{font-size:12.5px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;}
+  .track{margin-bottom:44px;}
+
+  .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s;
+    position:relative;
+  }
+  .card:hover{border-color:var(--violet-dim);transform:translateY(-2px);}
+  .card.talent-track{background:linear-gradient(180deg,var(--panel),var(--panel-2));}
+  .card .flag{
+    position:absolute;top:-9px;right:16px;background:var(--amber);color:#241705;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;
+    padding:3px 8px;border-radius:5px;text-transform:uppercase;font-weight:700;
+  }
+  .card-top{display:flex;gap:12px;align-items:flex-start;}
+  .avatar{
+    width:42px;height:42px;border-radius:9px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+    border:1px solid var(--line);
+  }
+  .card-name{font-family:'Space Grotesk',sans-serif;font-size:16.5px;}
+  .card-title{font-size:11.5px;color:var(--violet);margin-top:1px;font-family:'IBM Plex Mono',monospace;}
+  .talent-track .card-title{color:var(--amber);}
+  .card-desc{font-size:13px;color:var(--text-dim);flex-grow:1;}
+  .card-stats{display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-dim);border-top:1px solid var(--line);padding-top:10px;}
+  .card-stats b{color:var(--mint);display:block;font-size:12.5px;font-weight:500;}
+  .run-btn{
+    background:var(--violet-dim);color:var(--text);border:none;border-radius:8px;
+    padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+    cursor:pointer;transition:background .15s;
+  }
+  .run-btn:hover{background:var(--violet);}
+  .talent-track .run-btn{background:var(--amber-dim);}
+  .talent-track .run-btn:hover{background:var(--amber);color:#241705;}
+
+  .builder-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:var(--panel-2);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:22px 24px;margin-top:8px;flex-wrap:wrap;
+  }
+  .builder-cta .t{font-family:'Space Grotesk',sans-serif;font-size:17px;}
+  .builder-cta .d{font-size:13px;color:var(--text-dim);margin-top:4px;}
+  .btn-outline{
+    background:transparent;border:1px solid var(--violet-dim);color:var(--text);
+    padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;
+  }
+  .btn-outline:hover{border-color:var(--violet);color:var(--violet);}
+
+  .overlay{
+    position:fixed;inset:0;background:rgba(8,9,12,.75);backdrop-filter:blur(3px);
+    display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    max-width:700px;width:100%;padding:0;overflow:hidden;
+  }
+  .modal-head{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .modal-head h3{font-family:'Space Grotesk',sans-serif;font-size:19px;margin:0 0 4px;}
+  .modal-head p{font-size:13px;color:var(--text-dim);margin:0;}
+  .close-x{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+  .close-x:hover{color:var(--text);}
+  .modal-body{padding:22px 26px;}
+
+  .prompt-box{
+    background:var(--ink);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-dim);
+    width:100%;resize:vertical;min-height:56px;
+  }
+  .go-btn{
+    margin-top:14px;background:var(--violet);color:#101018;border:none;border-radius:9px;
+    padding:11px 20px;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .go-btn:hover{filter:brightness(1.1);}
+  .go-btn:disabled{opacity:.5;cursor:default;}
+
+  .feed{margin-top:18px;display:flex;flex-direction:column;gap:6px;min-height:10px;font-family:'IBM Plex Mono',monospace;}
+  .feed-row{
+    display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateY(4px);
+    animation:rise .35s forwards;background:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:10px 13px;
+  }
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+  .feed-hash{color:var(--mint);font-size:11px;flex-shrink:0;margin-top:2px;}
+  .feed-emoji{font-size:15px;flex-shrink:0;}
+  .feed-agent{font-size:11px;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;}
+  .feed-task{font-size:12.5px;color:var(--text);margin-top:2px;font-family:'Inter',sans-serif;}
+  .feed-tool{font-size:11.5px;color:var(--text-dim);margin-top:5px;border-top:1px solid var(--line);padding-top:5px;}
+  .wave-tag{font-size:10px;color:var(--amber);margin:6px 0 0;text-transform:uppercase;letter-spacing:.08em;}
+
+  .deliverable{
+    margin-top:18px;background:var(--ink);border:1px solid var(--mint);border-radius:12px;
+    padding:18px 20px;opacity:0;animation:rise .4s forwards;
+  }
+  .deliverable h4{font-family:'Space Grotesk',sans-serif;font-size:15.5px;color:var(--mint);margin:0 0 10px;}
+  .deliverable pre{
+    white-space:pre-wrap;font-family:'IBM Plex Mono',monospace;font-size:11.8px;
+    color:var(--text-dim);margin:0;line-height:1.65;
+  }
+  .deliverable .human{
+    margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--amber);display:flex;gap:6px;align-items:center;font-family:'IBM Plex Mono',monospace;
+  }
+
+  .steps{display:flex;gap:6px;margin-bottom:18px;}
+  .step-dot{flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .step-dot.active{background:var(--violet);}
+  .opt-list{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s;
+  }
+  .opt:hover{border-color:var(--violet-dim);}
+  .opt.sel{border-color:var(--violet);background:#232041;}
+  .opt .n{font-family:'Space Grotesk',sans-serif;font-size:14px;}
+  .opt .d{font-size:12px;color:var(--text-dim);margin-top:2px;}
+  .field{margin-bottom:14px;}
+  .field label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);display:block;margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
+  .field input,.field select{
+    width:100%;background:var(--ink);border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;
+  }
+  .step-nav{display:flex;justify-content:space-between;margin-top:20px;gap:10px;}
+
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:22px;font-size:12px;color:var(--text-dim);}
+  footer b{color:var(--text);}
+
+  @media (max-width:640px){
+    .econ{grid-template-columns:repeat(2,1fr);}
+    .roster{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">ai_workforce --env=preview</div>
+    <h1>Innvonix runs new business and delivery on <span class="hi">an AI workforce</span>.</h1>
+    <p class="sub">Eight operators, each a small team of specialist agents, covering the loops that eat the most hours between an inbound quote request and a signed, staffed engagement.</p>
+    <p class="lead">// This is a working simulation for a stakeholder walkthrough.
+// All figures, leads, and codebases below are illustrative.
+// Not connected to quote.innvonix.com, Upwork, Clutch, or any live CRM.</p>
+  </header>
+
+  <div class="econ" id="econStrip"></div>
+
+  <div class="track" id="track-newbiz">
+    <div class="section-head">
+      <h2>📨 New Business operators</h2>
+      <span class="track-note">quote → proposal → signed SOW</span>
+    </div>
+    <div class="roster" id="roster-newbiz"></div>
+  </div>
+
+  <div class="track" id="track-talent">
+    <div class="section-head">
+      <h2>🧑‍💻 Hire Developers operators</h2>
+      <span class="track-note">staff augmentation & dedicated teams</span>
+    </div>
+    <div class="roster" id="roster-talent"></div>
+  </div>
+
+  <div class="builder-cta">
+    <div>
+      <div class="t">Another recurring loop worth automating?</div>
+      <div class="d">Clone one of the eight workflows above into a new operator in three steps.</div>
+    </div>
+    <button class="btn-outline" onclick="openBuilder()">+ Build a new operator</button>
+  </div>
+
+  <footer>
+    <p><b>Illustrative prototype.</b> All figures, quotes, RFPs, candidate profiles and deliverable text are placeholders generated for this demo, not real Innvonix data. This tool is not connected to quote.innvonix.com, the Upwork/Clutch profiles, or any live CRM, HR, or delivery system.</p>
+    <p><b>Human in the loop by design.</b> Every operator ends with a QA step, and every deliverable is drafted for a person to review, edit, and approve before it reaches a prospect, a client, or a candidate.</p>
+  </footer>
+</div>
+
+<div class="overlay" id="runOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="runTitle"></h3>
+        <p id="runSub"></p>
+      </div>
+      <button class="close-x" onclick="closeModal('runOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);display:block;margin-bottom:6px;font-family:'IBM Plex Mono',monospace;">input</label>
+      <textarea class="prompt-box" id="runPrompt"></textarea>
+      <button class="go-btn" id="runGoBtn" onclick="runOperator()">Run operator</button>
+      <div class="feed" id="runFeed"></div>
+      <div id="runDeliverable"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="buildOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Build a new operator</h3>
+        <p>Clone a workflow, name it, set a cadence.</p>
+      </div>
+      <button class="close-x" onclick="closeModal('buildOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="steps"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
+      <div id="buildStep"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const AGENT_ROLES = {
+  researcher:{emoji:'🔍',label:'Researcher',tools:['company_scan','sentiment_scan','competitor_scan','save']},
+  solutions_architect:{emoji:'🏗️',label:'Solutions Architect',tools:['scope_read','architecture_review','solution_design','save']},
+  estimator:{emoji:'🧮',label:'Estimator',tools:['effort_estimate','cost_model','remediation_estimate','save']},
+  proposal_writer:{emoji:'✍️',label:'Proposal Writer',tools:['draft_brief','draft_proposal','draft_rfp_doc','draft_positioning','draft_case_pack','draft_shortlist','draft_renewal_brief','draft_diligence_report','save']},
+  qa_reviewer:{emoji:'✅',label:'QA Reviewer',tools:['scope_check','compliance_check','accuracy_check','tone_check','save']},
+  portfolio_specialist:{emoji:'📁',label:'Portfolio Specialist',tools:['portfolio_match','case_study_pull','save']},
+  competitive_analyst:{emoji:'📈',label:'Competitive Analyst',tools:['pricing_benchmark','delivery_model_compare','save']},
+  bid_analyst:{emoji:'📋',label:'Bid Analyst',tools:['rfp_parse','submission_checklist','save']},
+  security_auditor:{emoji:'🔐',label:'Security Auditor',tools:['compliance_audit','security_scan','save']},
+  talent_matcher:{emoji:'🧑‍💻',label:'Talent Matcher',tools:['skill_match','candidate_rank','save']},
+  hr_coordinator:{emoji:'🗂️',label:'HR Coordinator',tools:['bench_check','availability_check','save']},
+  account_manager:{emoji:'🤝',label:'Account Manager',tools:['delivery_review','risk_signal_check','save']}
+};
+
+const TOOLS = {
+  company_scan:()=>'Pulled prospect company profile, current stack signals, and industry context.',
+  sentiment_scan:()=>'Scanned recent client-side signals for satisfaction or risk indicators.',
+  competitor_scan:()=>'Identified named competing agencies and their public case studies.',
+  scope_read:()=>'Parsed request into stack, integrations, and rough architecture implications.',
+  architecture_review:()=>'Reviewed system architecture for scalability and technical debt hotspots.',
+  solution_design:()=>'Defined technical approach and module breakdown for the engagement.',
+  effort_estimate:()=>'Effort estimate: 10-14 weeks, 3-person team, based on comparable builds.',
+  cost_model:()=>'Cost model built across phases with a mid-tier fixed-bid range.',
+  remediation_estimate:()=>'Remediation estimate: 3-4 weeks to close flagged gaps.',
+  draft_brief:()=>'Drafted qualification brief with scope assumptions and next-step ask.',
+  draft_proposal:()=>'Drafted full proposal: scope, timeline, team composition, pricing.',
+  draft_rfp_doc:()=>'Drafted RFP response following the requested submission format.',
+  draft_positioning:()=>'Drafted 3 positioning talking points for the sales call.',
+  draft_case_pack:()=>'Drafted 1-page case study pack matched to the lead\'s use case.',
+  draft_shortlist:()=>'Drafted candidate shortlist summary with proposed engagement terms.',
+  draft_renewal_brief:()=>'Drafted renewal brief with delivery recap and pricing options.',
+  draft_diligence_report:()=>'Drafted due diligence report with findings and recommended path.',
+  scope_check:()=>'Scope assumptions checked against the original request, no gaps found.',
+  compliance_check:()=>'Compliance requirements checked against the proposed approach.',
+  accuracy_check:()=>'Cross-checked referenced figures and case studies for accuracy.',
+  tone_check:()=>'Tone and formatting checked before this leaves the draft stage.',
+  portfolio_match:()=>'Matched 2-3 comparable past projects by industry and feature set.',
+  case_study_pull:()=>'Pulled outcome data for the strongest matching case studies.',
+  pricing_benchmark:()=>'Benchmarked likely competitor pricing bands for this deal size.',
+  delivery_model_compare:()=>'Compared fixed-bid vs dedicated-team delivery models against competitors.',
+  rfp_parse:()=>'Parsed RFP scope, evaluation criteria, and submission requirements.',
+  submission_checklist:()=>'Built submission checklist against the RFP\'s stated format.',
+  compliance_audit:()=>'Checked proposed approach against industry-specific compliance needs.',
+  security_scan:()=>'Flagged 2 medium-severity gaps, no critical vulnerabilities this pass.',
+  skill_match:()=>'Ranked available candidates against the requested skill profile.',
+  candidate_rank:()=>'Shortlisted top candidates by fit and confirmed availability.',
+  bench_check:()=>'Checked bench availability against skill set and time zone overlap.',
+  availability_check:()=>'Confirmed 3 of 4 matched candidates available within 2 weeks.',
+  delivery_review:()=>'Reviewed sprint velocity, scope changes, and open escalations.',
+  risk_signal_check:()=>'Checked for response-time or sentiment shifts across recent sprints.',
+  save:()=>'Output saved to the operator\'s deliverable draft.'
+};
+
+const WORKFLOWS = {
+  quote_qualification:{
+    name:'quote_qualification', title:'Inbound Quote Qualification', mode:'sequential', track:'newbiz', tag:'flagship',
+    deliverable:'Qualification Brief',
+    desc:'Turns a raw "Get a Quote" form submission into a scoped, prioritized opportunity.',
+    sample:'New quote request: e-commerce platform rebuild, mentions React and a Shopify migration, budget range not specified, submitted via quote.innvonix.com.',
+    tasks:[
+      {agent:'researcher', task:"Research the prospect's company, current site, and industry to understand context behind the request.", deps:[]},
+      {agent:'solutions_architect', task:"Assess technical scope: what stack, integrations, and rough architecture the request implies.", deps:[0]},
+      {agent:'estimator', task:"Produce a rough effort and cost band based on scope and comparable past projects.", deps:[1]},
+      {agent:'portfolio_specialist', task:"Pull 2-3 comparable past projects from the portfolio to reference in follow-up.", deps:[0]},
+      {agent:'proposal_writer', task:"Draft the qualification brief and a personalized reply proposing a discovery call.", deps:[2,3]},
+      {agent:'qa_reviewer', task:"Check the brief's scope assumptions and estimate range before it reaches the sales lead.", deps:[4]}
+    ]
+  },
+  proposal_drafting:{
+    name:'proposal_drafting', title:'Proposal & SOW Drafting', mode:'sequential', track:'newbiz',
+    deliverable:'Proposal Draft',
+    desc:'Builds a full proposal and statement of work after a discovery call.',
+    sample:'Discovery call complete for a telemedicine platform: video consults, scheduling, lightweight EHR records, iOS/Android plus web.',
+    tasks:[
+      {agent:'solutions_architect', task:"Turn discovery notes into a phased technical approach and module breakdown.", deps:[]},
+      {agent:'estimator', task:"Estimate timeline and cost per phase and per module.", deps:[0]},
+      {agent:'portfolio_specialist', task:"Select the most relevant case studies to include as proof points.", deps:[]},
+      {agent:'proposal_writer', task:"Draft the full proposal and SOW: scope, timeline, team composition, pricing.", deps:[1,2]},
+      {agent:'qa_reviewer', task:"Review pricing consistency, scope clarity, and formatting before sending.", deps:[3]}
+    ]
+  },
+  rfp_response:{
+    name:'rfp_response', title:'RFP / Tender Response', mode:'sequential', track:'newbiz',
+    deliverable:'RFP Response Draft',
+    desc:'Parses a formal RFP and produces a compliant, competitive response draft.',
+    sample:"A regional healthcare network's RFP for a patient portal rebuild: HIPAA compliance required, fixed-bid preferred, submission due in 15 days.",
+    tasks:[
+      {agent:'bid_analyst', task:"Parse the RFP for scope, evaluation criteria, compliance requirements, and submission format.", deps:[]},
+      {agent:'solutions_architect', task:"Define the technical solution and delivery approach that satisfies the stated requirements.", deps:[0]},
+      {agent:'security_auditor', task:"Confirm the proposed approach meets the stated compliance requirements and flag any gaps.", deps:[1]},
+      {agent:'estimator', task:"Build the fixed-bid cost structure per the RFP's requested pricing format.", deps:[1]},
+      {agent:'proposal_writer', task:"Draft the full RFP response following the requested format and evaluation criteria.", deps:[2,3]},
+      {agent:'qa_reviewer', task:"Final compliance and formatting check against the RFP's submission checklist.", deps:[4]}
+    ]
+  },
+  competitive_intel:{
+    name:'competitive_intel', title:'Competitive & Pricing Intel', mode:'dag', track:'newbiz',
+    deliverable:'Competitive Brief',
+    desc:"Benchmarks a prospect's alternatives before a pricing conversation.",
+    sample:'Prospect is also evaluating two other dev agencies for a fintech MVP build; sales wants a positioning angle before the call.',
+    tasks:[
+      {agent:'researcher', task:"Research the named competing agencies: focus areas, published case studies, public reviews.", deps:[]},
+      {agent:'competitive_analyst', task:"Benchmark likely pricing bands and delivery models against those competitors.", deps:[0]},
+      {agent:'portfolio_specialist', task:"Identify the strongest comparable case study to counter-position against the competitors' strengths.", deps:[0]},
+      {agent:'proposal_writer', task:"Draft talking points and a positioning brief for the sales call.", deps:[1,2]}
+    ]
+  },
+  case_study_matching:{
+    name:'case_study_matching', title:'Portfolio & Case Study Matching', mode:'sequential', track:'newbiz',
+    deliverable:'Case Study Pack',
+    desc:"Matches an inbound lead's industry and use case to the most relevant proof points.",
+    sample:'New lead in the event management space asking for examples of similar work before a call.',
+    tasks:[
+      {agent:'researcher', task:"Identify the lead's industry, use case, and any specific features they referenced.", deps:[]},
+      {agent:'portfolio_specialist', task:"Pull the closest matching past projects by industry and feature set.", deps:[0]},
+      {agent:'proposal_writer', task:"Draft a short case study pack with the matched projects and outcomes framed for this lead.", deps:[1]},
+      {agent:'qa_reviewer', task:"Check that all project details and outcomes referenced are accurate before sending.", deps:[2]}
+    ]
+  },
+  developer_matching:{
+    name:'developer_matching', title:'Hire Developers: Talent Matching', mode:'sequential', track:'talent',
+    deliverable:'Candidate Shortlist',
+    desc:'Matches an inbound "Hire Developers" request to available bench talent.',
+    sample:'Client wants to hire 2 dedicated React Native developers for a 6-month engagement, mid-level, US time zone overlap required.',
+    tasks:[
+      {agent:'hr_coordinator', task:"Check bench availability against the requested skill set, seniority, and time zone overlap.", deps:[]},
+      {agent:'talent_matcher', task:"Rank the best-fit available developers against the request's specific requirements.", deps:[0]},
+      {agent:'solutions_architect', task:"Sanity-check the requested team composition against the likely project needs.", deps:[1]},
+      {agent:'proposal_writer', task:"Draft the candidate shortlist summary and proposed engagement terms.", deps:[1,2]},
+      {agent:'qa_reviewer', task:"Review the shortlist and terms for accuracy before it goes to the client.", deps:[3]}
+    ]
+  },
+  account_renewal:{
+    name:'account_renewal', title:'Dedicated Team Renewal & Health Check', mode:'sequential', track:'talent',
+    deliverable:'Renewal Brief',
+    desc:'Checks engagement health and prepares the renewal conversation.',
+    sample:"A dedicated 3-developer team's 6-month engagement is up for renewal in 3 weeks; client satisfaction unclear.",
+    tasks:[
+      {agent:'account_manager', task:"Review the engagement's delivery history: sprint velocity, scope changes, any escalations.", deps:[]},
+      {agent:'researcher', task:"Check for signals of client satisfaction or risk in recent communications.", deps:[]},
+      {agent:'estimator', task:"Model renewal pricing options, including any team scaling the client has hinted at.", deps:[0]},
+      {agent:'proposal_writer', task:"Draft the renewal brief and talking points for the account manager's call.", deps:[1,2]},
+      {agent:'qa_reviewer', task:"Check the brief's tone and figures before the renewal conversation.", deps:[3]}
+    ]
+  },
+  technical_diligence:{
+    name:'technical_diligence', title:'Technical Due Diligence', mode:'dag', track:'talent',
+    deliverable:'Due Diligence Report',
+    desc:'Assesses an existing codebase or system before quoting a complex engagement.',
+    sample:'A fintech prospect wants a security and architecture review of their existing codebase before committing to a rebuild engagement.',
+    tasks:[
+      {agent:'solutions_architect', task:"Review the existing system's architecture for scalability and technical debt hotspots.", deps:[]},
+      {agent:'security_auditor', task:"Audit for security and compliance gaps relevant to the client's industry.", deps:[]},
+      {agent:'estimator', task:"Estimate remediation and rebuild effort based on the findings.", deps:[0,1]},
+      {agent:'proposal_writer', task:"Draft the due diligence report with findings and a recommended engagement path.", deps:[2]},
+      {agent:'qa_reviewer', task:"Review findings for accuracy and tone before it goes to the prospect.", deps:[3]}
+    ]
+  }
+};
+
+const DTITLE = {
+  quote_qualification:'Qualification Brief — Quote #QT-4471',
+  proposal_drafting:'Proposal Draft — Telemedicine Platform',
+  rfp_response:'RFP Response Draft — Patient Portal Rebuild',
+  competitive_intel:'Competitive Brief — Fintech MVP Pitch',
+  case_study_matching:'Case Study Pack — Event Management Lead',
+  developer_matching:'Candidate Shortlist — React Native Team',
+  account_renewal:'Renewal Brief — Dedicated Team Engagement',
+  technical_diligence:'Due Diligence Report — Fintech Codebase Review'
+};
+
+const FINAL = {
+quote_qualification:`Prospect: mid-size e-commerce retailer, current site on a legacy PHP stack, requesting a React front-end rebuild with a Shopify migration.
+
+Scope read: front-end rebuild (React), Shopify Plus migration, product catalog import (~3,200 SKUs), no custom backend beyond Shopify's own.
+
+Estimate band: 10-14 weeks, 3-person team (1 architect, 2 frontend devs), mid-tier fixed-bid range given catalog size.
+
+Comparable projects: 2 prior e-commerce rebuilds referenced from the portfolio, both Shopify migrations of similar catalog scale.
+
+Recommended next step: 30-minute discovery call to confirm integration needs (payment gateway, ERP if any) before firming the estimate.
+
+NOTE: illustrative example. Scope, estimate, and portfolio references are placeholders; a solutions architect confirms scope on the discovery call before any figure is quoted.`,
+
+proposal_drafting:`Project: telemedicine platform — video consults, scheduling, lightweight EHR records, iOS/Android plus web.
+
+Phased approach:
+Phase 1 (4 weeks): scheduling, auth, patient/provider profiles
+Phase 2 (5 weeks): video consult integration, notifications
+Phase 3 (4 weeks): lightweight EHR record-keeping, admin dashboard
+Phase 4 (2 weeks): QA hardening, app store submission
+
+Team: 1 solutions architect, 2 backend devs, 2 mobile devs, 1 QA, 1 part-time PM
+Estimated timeline: 15 weeks | Estimated cost: mid-range fixed-bid, healthcare-tier data handling included
+
+Proof points: 2 prior healthcare-adjacent builds included, both using HIPAA-aware data handling patterns.
+
+NOTE: illustrative example. Timeline, team composition, and pricing are placeholders; final SOW terms require a signed discovery brief and legal review.`,
+
+rfp_response:`RFP: regional healthcare network, patient portal rebuild, HIPAA compliance required, fixed-bid preferred, 15-day submission window.
+
+Technical approach: modular rebuild preserving the existing patient-data migration path, encrypted-at-rest storage, role-based access control, audit logging on all record access.
+
+Compliance check: proposed architecture satisfies the stated access-control and audit-trail requirements; business associate agreement terms flagged for legal review before submission.
+
+Fixed-bid structure: 3 milestone payments tied to phase completion, matching the RFP's requested format.
+
+Submission checklist: technical narrative, team resumes, compliance attestation, and references, all drafted and ready for final formatting review.
+
+NOTE: illustrative example. Compliance claims, pricing, and team details are placeholders; legal and a compliance specialist must review before submission.`,
+
+competitive_intel:`Prospect is comparing Innvonix against two other agencies for a fintech MVP build.
+
+Competitor read: both alternatives lean toward fixed-scope, offshore-only delivery with a limited post-launch support window; neither publishes fintech-specific case studies.
+
+Pricing band: alternatives likely quote 10-15% lower on headline price but with narrower scope.
+
+Counter-position: lead with the dedicated-team flexibility model and the closest matching case study (a lending-platform MVP), plus the included 30-day post-launch support window.
+
+Talking points drafted: 3 positioning lines for the sales call, focused on flexibility and post-launch support rather than headline price.
+
+NOTE: illustrative example. Competitor names, pricing, and positioning are placeholders based on general market patterns, not verified competitor data.`,
+
+case_study_matching:`Lead context: event management platform, ticketing plus discovery feed plus creator profiles.
+
+Matched case studies:
+1. A dance-and-nightlife event discovery app (closest match: discovery feed, ticketing, social profiles)
+2. A ticketing platform with QR check-in for a mid-size events company
+
+Pack drafted: 1-page case study summary highlighting outcomes and launch timeline, framed for this lead's specific use case.
+
+NOTE: illustrative example. Case study details and outcomes referenced are placeholders; a portfolio lead confirms accuracy before sending externally.`,
+
+developer_matching:`Request: 2 dedicated React Native developers, mid-level, 6-month engagement, US time zone overlap required.
+
+Bench check: 4 candidates meet the skill and seniority bar; 3 have confirmed US-overlap availability starting within 2 weeks.
+
+Shortlist:
+1. Senior-leaning mid-level dev, 4 yrs React Native, prior fintech app experience
+2. Mid-level dev, 3 yrs React Native, prior e-commerce app experience
+(2 backup candidates held in reserve)
+
+Proposed terms: 6-month dedicated engagement, standard SOW template, 2-week ramp period included.
+
+NOTE: illustrative example. Candidate details and availability are placeholders; HR confirms actual availability before any offer is extended to the client.`,
+
+account_renewal:`Engagement: 3-developer dedicated team, 6 months in, renewal due in 3 weeks.
+
+Delivery history: sprint velocity stable, 1 scope change absorbed without a timeline slip, no unresolved escalations on file.
+
+Risk signals: response time on the client's side has slowed over the last 2 sprints; no explicit dissatisfaction noted.
+
+Renewal options modeled: straight 6-month renewal at the current rate, or renewal plus 1 additional developer given the client's roadmap hints.
+
+Recommended approach: open with a delivery recap and a roadmap question before presenting renewal options, to surface any unspoken concerns first.
+
+NOTE: illustrative example. Delivery metrics and renewal options are placeholders; the account manager confirms actual engagement status before the call.`,
+
+technical_diligence:`Scope: security and architecture review of an existing fintech codebase ahead of a potential rebuild engagement.
+
+Architecture findings: monolithic structure with tightly coupled payment logic, moderate technical debt in the reporting module, no major scalability blockers at current volume.
+
+Security findings: 2 medium-severity gaps flagged (stale dependency versions, incomplete audit logging on financial transactions); no critical vulnerabilities identified in this pass.
+
+Remediation estimate: 3-4 weeks to close flagged gaps before a rebuild engagement begins, separate from the rebuild timeline itself.
+
+Recommended path: remediate flagged gaps first as a short fixed-bid engagement, then scope the rebuild separately once the codebase is stable.
+
+NOTE: illustrative example. Findings and estimates are placeholders from a simulated review, not an actual audit; a security auditor must perform a real review before any client-facing claims are made.`
+};
+
+const EMPLOYEES = [
+  {id:'emp1', name:'Ellis', title:'Quote Qualification Operator', wf:'quote_qualification', handled:'64 quotes/mo', hrs:12, win:'3.2x faster first response', status:'idle'},
+  {id:'emp2', name:'Marlow', title:'Proposal Drafting Operator', wf:'proposal_drafting', handled:'18 proposals/mo', hrs:20, win:'2 days to 4 hrs draft time', status:'idle'},
+  {id:'emp3', name:'Presto', title:'RFP Response Operator', wf:'rfp_response', handled:'5 RFPs/mo', hrs:24, win:'15-day to 3-day draft', status:'idle'},
+  {id:'emp4', name:'Fenn', title:'Competitive Intel Operator', wf:'competitive_intel', handled:'22 briefs/mo', hrs:8, win:'+18% win rate on contested deals', status:'idle'},
+  {id:'emp5', name:'Hollis', title:'Case Study Matching Operator', wf:'case_study_matching', handled:'40 packs/mo', hrs:6, win:'same-day turnaround', status:'idle'},
+  {id:'emp6', name:'Ashby', title:'Talent Matching Operator', wf:'developer_matching', handled:'30 requests/mo', hrs:10, win:'48-hr shortlist turnaround', status:'idle'},
+  {id:'emp7', name:'Query', title:'Account Renewal Operator', wf:'account_renewal', handled:'14 renewals/mo', hrs:9, win:'92% renewal rate', status:'idle'},
+  {id:'emp8', name:'Vantage', title:'Technical Diligence Operator', wf:'technical_diligence', handled:'6 audits/mo', hrs:18, win:'3-week to 5-day report', status:'idle'}
+];
+
+const CONFIG = {
+  trackLabels:{newbiz:'New Business', talent:'Hire Developers'},
+  econLabels:['Operators live','Hours/week reclaimed','Workflows automated','Avg. QA pass rate']
+};
+
+/* ============ RENDER ============ */
+let customOperators = [];
+
+function econStrip(){
+  const totalHrs = EMPLOYEES.reduce((s,e)=>s+e.hrs,0) + customOperators.reduce((s,e)=>s+e.hrs,0);
+  const el = document.getElementById('econStrip');
+  const vals = [
+    [String(EMPLOYEES.length + customOperators.length), CONFIG.econLabels[0]],
+    [totalHrs+'h', CONFIG.econLabels[1]],
+    [String(Object.keys(WORKFLOWS).length), CONFIG.econLabels[2]],
+    ['97%', CONFIG.econLabels[3]]
+  ];
+  el.innerHTML = vals.map(v=>`<div class="cell"><div class="num">${v[0]}</div><div class="lbl">${v[1]}</div></div>`).join('');
+}
+
+function renderCard(emp, trackKey){
+  const wf = WORKFLOWS[emp.wf];
+  const isTalent = trackKey==='talent';
+  return `
+  <div class="card ${isTalent?'talent-track':''}">
+    ${wf.tag==='flagship' ? '<div class="flag">Flagship</div>' : ''}
+    <div class="card-top">
+      <div class="avatar">${AGENT_ROLES[wf.tasks[0].agent].emoji}</div>
+      <div>
+        <div class="card-name">${emp.name}</div>
+        <div class="card-title">${emp.title}</div>
+      </div>
+    </div>
+    <div class="card-desc">${wf.desc}</div>
+    <div class="card-stats">
+      <div><b>${emp.handled}</b>handled</div>
+      <div><b>${emp.hrs}h/wk</b>reclaimed</div>
+      <div><b>${emp.win}</b>result</div>
+    </div>
+    <button class="run-btn" onclick="openRun('${emp.wf}')">Run ${wf.deliverable} →</button>
+  </div>`;
+}
+
+function renderRoster(){
+  document.getElementById('roster-newbiz').innerHTML =
+    EMPLOYEES.filter(e=>WORKFLOWS[e.wf].track==='newbiz').map(e=>renderCard(e,'newbiz')).join('') +
+    customOperators.filter(e=>WORKFLOWS[e.wf].track==='newbiz').map(e=>renderCard(e,'newbiz')).join('');
+  document.getElementById('roster-talent').innerHTML =
+    EMPLOYEES.filter(e=>WORKFLOWS[e.wf].track==='talent').map(e=>renderCard(e,'talent')).join('') +
+    customOperators.filter(e=>WORKFLOWS[e.wf].track==='talent').map(e=>renderCard(e,'talent')).join('');
+  econStrip();
+}
+
+/* ============ RUN ENGINE ============ */
+let currentWF = null;
+let commitCounter = 0;
+
+function randHash(){
+  return Math.random().toString(16).slice(2,9);
+}
+
+function openRun(wfKey){
+  currentWF = wfKey;
+  const wf = WORKFLOWS[wfKey];
+  document.getElementById('runTitle').textContent = wf.title;
+  document.getElementById('runSub').textContent = wf.desc;
+  document.getElementById('runPrompt').value = wf.sample;
+  document.getElementById('runFeed').innerHTML = '';
+  document.getElementById('runDeliverable').innerHTML = '';
+  document.getElementById('runGoBtn').disabled = false;
+  document.getElementById('runGoBtn').textContent = 'Run operator';
+  document.getElementById('runOverlay').classList.add('open');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function computeWaves(tasks){
+  const wave = new Array(tasks.length).fill(0);
+  tasks.forEach((t,i)=>{
+    if(t.deps.length===0){ wave[i]=0; }
+    else { wave[i] = Math.max(...t.deps.map(d=>wave[d])) + 1; }
+  });
+  return wave;
+}
+
+function runOperator(){
+  const wf = WORKFLOWS[currentWF];
+  const btn = document.getElementById('runGoBtn');
+  const feed = document.getElementById('runFeed');
+  const deliverEl = document.getElementById('runDeliverable');
+  feed.innerHTML = '';
+  deliverEl.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+
+  const waves = computeWaves(wf.tasks);
+  let delay = 150;
+  let lastWave = -1;
+
+  wf.tasks.forEach((t, i)=>{
+    const w = waves[i];
+    const rowDelay = delay;
+    setTimeout(()=>{
+      if(wf.mode==='dag' && w !== lastWave){
+        lastWave = w;
+        const tag = document.createElement('div');
+        tag.className = 'wave-tag';
+        tag.textContent = 'wave ' + (w+1) + (w===0 ? ' — parallel start' : '');
+        feed.appendChild(tag);
+      }
+      const agent = AGENT_ROLES[t.agent];
+      const toolKey = agent.tools[Math.floor(Math.random()*(agent.tools.length-1))];
+      const row = document.createElement('div');
+      row.className = 'feed-row';
+      row.innerHTML = `
+        <div class="feed-hash">${randHash()}</div>
+        <div class="feed-emoji">${agent.emoji}</div>
+        <div style="flex:1">
+          <div class="feed-agent">${agent.label}</div>
+          <div class="feed-task">${t.task}</div>
+          <div class="feed-tool">→ ${TOOLS[toolKey]()}</div>
+        </div>`;
+      feed.appendChild(row);
+      feed.scrollTop = feed.scrollHeight;
+    }, rowDelay);
+    delay += (wf.mode==='dag' ? 420 : 520);
+  });
+
+  setTimeout(()=>{
+    btn.textContent = 'Run again';
+    btn.disabled = false;
+    deliverEl.innerHTML = `
+      <div class="deliverable">
+        <h4>📄 ${DTITLE[currentWF]}</h4>
+        <pre>${FINAL[currentWF]}</pre>
+        <div class="human">→ drafted for review — an Innvonix team member approves before this reaches a prospect, client, or candidate.</div>
+      </div>`;
+  }, delay + 250);
+}
+
+/* ============ BUILDER ============ */
+let buildState = {step:1, base:null, name:'', cadence:'Weekly'};
+
+function openBuilder(){
+  buildState = {step:1, base:null, name:'', cadence:'Weekly'};
+  renderBuildStep();
+  document.getElementById('buildOverlay').classList.add('open');
+}
+
+function renderBuildStep(){
+  for(let i=1;i<=3;i++) document.getElementById('dot'+i).classList.toggle('active', i<=buildState.step);
+  const el = document.getElementById('buildStep');
+
+  if(buildState.step===1){
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--text-dim);margin-top:0;">Step 1 — pick the workflow this operator will run.</p>
+      <div class="opt-list">
+        ${Object.values(WORKFLOWS).map(w=>`
+          <div class="opt ${buildState.base===w.name?'sel':''}" onclick="selectBase('${w.name}')">
+            <div class="n">${w.title}</div>
+            <div class="d">${w.desc}</div>
+          </div>`).join('')}
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button class="run-btn" ${buildState.base?'':'disabled style="opacity:.5"'} onclick="buildState.step=2;renderBuildStep()">Next →</button>
+      </div>`;
+  } else if(buildState.step===2){
+    const w = WORKFLOWS[buildState.base];
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--text-dim);margin-top:0;">Step 2 — name the operator and set a cadence, based on <b style="color:var(--text)">${w.title}</b>.</p>
+      <div class="field">
+        <label>Operator name</label>
+        <input id="opName" type="text" placeholder="e.g. Pivot" value="${buildState.name}">
+      </div>
+      <div class="field">
+        <label>Run cadence</label>
+        <select id="opCadence">
+          <option ${buildState.cadence==='Daily'?'selected':''}>Daily</option>
+          <option ${buildState.cadence==='Weekly'?'selected':''}>Weekly</option>
+          <option ${buildState.cadence==='Monthly'?'selected':''}>Monthly</option>
+          <option ${buildState.cadence==='On trigger'?'selected':''}>On trigger</option>
+        </select>
+      </div>
+      <div class="step-nav">
+        <button class="btn-outline" onclick="buildState.step=1;renderBuildStep()">← Back</button>
+        <button class="run-btn" onclick="confirmStep2()">Next →</button>
+      </div>`;
+  } else if(buildState.step===3){
+    const w = WORKFLOWS[buildState.base];
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--text-dim);margin-top:0;">Step 3 — confirm and add to the roster.</p>
+      <div class="opt sel" style="cursor:default">
+        <div class="n">${buildState.name || 'Untitled Operator'}</div>
+        <div class="d">Runs <b style="color:var(--text)">${w.title}</b> · ${buildState.cadence} · ${CONFIG.trackLabels[w.track]} track</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-outline" onclick="buildState.step=2;renderBuildStep()">← Back</button>
+        <button class="run-btn" onclick="finishBuild()">Add operator</button>
+      </div>`;
+  }
+}
+
+function selectBase(key){ buildState.base = key; renderBuildStep(); }
+function confirmStep2(){
+  buildState.name = document.getElementById('opName').value.trim();
+  buildState.cadence = document.getElementById('opCadence').value;
+  buildState.step = 3;
+  renderBuildStep();
+}
+function finishBuild(){
+  const w = WORKFLOWS[buildState.base];
+  customOperators.push({
+    id:'custom'+Date.now(),
+    name: buildState.name || 'New Operator',
+    title: buildState.cadence + ' · ' + CONFIG.trackLabels[w.track],
+    wf: buildState.base,
+    handled:'—', hrs:Math.max(2,Math.round(w.tasks.length*1.8)), win:'New — establishing baseline',
+    status:'idle'
+  });
+  renderRoster();
+  closeModal('buildOverlay');
+}
+
+/* init */
+renderRoster();
+</script>
+</body>
+</html>
